@@ -27,6 +27,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
     .route("/update", web::post().to(book::update))
     .route("/settings/create", web::post().to(settings::create))
     .route("/settings/update", web::post().to(settings::update))
+    .route("/update_key_value", web::post().to(book::update_key_value))
   );
   
   config.service(
