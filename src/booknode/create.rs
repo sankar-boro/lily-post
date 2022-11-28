@@ -35,7 +35,6 @@ pub async fn create(
     let auth = session.user_info()?;
     let author_id = Uuid::parse_str(&auth.userId)?;
     let new_id = time_uuid();
-    let new_id = new_id.to_string();
     let new__id = new_id.to_string();
     let book_id = &payload.bookId.to_uuid()?;
     let top_unique_id = &payload.topUniqueId.to_uuid()?;
