@@ -14,8 +14,8 @@ CREATE TABLE blogs (
     metadata text,
     createdAt timeuuid,
     updatedAt timeuuid,
-    PRIMARY KEY (blogId)
-);
+    PRIMARY KEY (blogId, createdAt)
+) WITH CLUSTERING ORDER BY (createdAt DESC);
 CREATE TABLE blog (
     blogId timeuuid,
     uniqueId timeuuid,
@@ -29,7 +29,7 @@ CREATE TABLE blog (
     createdAt timeuuid,
     updatedAt timeuuid,
     PRIMARY KEY (blogId, uniqueId)
-);
+) WITH CLUSTERING ORDER BY (uniqueId DESC);
 CREATE TABLE userblogs (
     blogId timeuuid,
     authorId timeuuid,
@@ -40,7 +40,7 @@ CREATE TABLE userblogs (
     createdAt timeuuid,
     updatedAt timeuuid,
     PRIMARY KEY (authorId, blogId)
-);
+) WITH CLUSTERING ORDER BY (blogId DESC);;
 CREATE TABLE categoryblogs (
     category text,
     blogId timeuuid,
@@ -52,7 +52,7 @@ CREATE TABLE categoryblogs (
     createdAt timeuuid,
     updatedAt timeuuid,
     PRIMARY KEY (category, blogId)
-);
+) WITH CLUSTERING ORDER BY (blogId DESC);
 
 TRUNCATE TABLE sankar.blogs;
 TRUNCATE TABLE sankar.blog;

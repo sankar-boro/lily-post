@@ -1,11 +1,11 @@
 use actix_session::Session;
 use actix_web::{HttpResponse, web};
+use lily_utils::time_uuid;
 use serde::{Deserialize, Serialize};
 use crate::{
     App,
     query::{ CREATE_BLOGS, CREATE_BLOG, CREATE_USER_BLOGS, CREATE_CATEGORY_BLOGS, CREATE_ALLCATEGORY }
 };
-use uuid::Uuid;
 use scylla::{
     batch::Batch,
     macros::FromRow
@@ -18,7 +18,6 @@ pub struct ParentRequest {
     title: String,
     body: Option<String>,
     metadata: String,
-    uniqueId: String,
     category: String,
     image_url: Option<String>,
 }
@@ -63,7 +62,9 @@ pub async fn create(
 
     let auth = session.user_info()?;
     let auth_id = &auth.userId.to_uuid()?;
-    let unique_id = Uuid::parse_str(&request.uniqueId)?;
+    let unique_id = time_uuid();
+    let unique___id = unique_id.to_string();
+
     let batch_values = (
         (&unique_id, &auth_id, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id),
         (&unique_id, &unique_id, &auth_id, &request.title, &body, &image_url, &identity, &request.metadata, &unique_id, &unique_id),
@@ -74,8 +75,8 @@ pub async fn create(
     app.query(CREATE_ALLCATEGORY, (&request.category, "demo")).await?;
     Ok(
         HttpResponse::Ok().json(ParentResponse {
-            blogId: request.uniqueId.clone(),
-            uniqueId: request.uniqueId.clone(),
+            blogId: unique___id.clone(),
+            uniqueId: unique___id.clone(),
             parentId: None,
             title: request.title.clone(),
             body: body.clone(),
@@ -83,8 +84,8 @@ pub async fn create(
             identity,
             authorId: auth_id.to_string(),
             metadata: request.metadata.clone(),
-            createdAt: request.uniqueId.clone(),
-            updatedAt: request.uniqueId.clone(),
+            createdAt: unique___id.clone(),
+            updatedAt: unique___id.clone(),
         })
     )
 }

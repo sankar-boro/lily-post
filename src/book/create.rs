@@ -1,17 +1,22 @@
-use actix_session::Session;
-use actix_web::{HttpResponse, web};
-use serde::{Deserialize, Serialize};
-use uuid::Uuid;
+use crate::auth::AuthSession;
 use crate::{
     App, 
-    query::{CREATE_BOOKS, CREATE_BOOK, CREATE_USER_BOOKS, CREATE_CATEGORY_BOOKS, CREATE_ALLCATEGORY }
+    query::{
+        CREATE_BOOKS, CREATE_BOOK, CREATE_USER_BOOKS, 
+        CREATE_CATEGORY_BOOKS, CREATE_ALLCATEGORY 
+    }
 };
-use validator::Validate;
+
 use scylla::{
     batch::Batch,
     macros::FromRow
 };
-use crate::auth::AuthSession;
+use uuid::Uuid;
+use validator::Validate;
+use actix_session::Session;
+use lily_utils::time_uuid;
+use actix_web::{HttpResponse, web};
+use serde::{Deserialize, Serialize};
 // use jsonwebtoken::{encode, Algorithm, Header, EncodingKey};
 
 #[derive(Deserialize, Validate, FromRow)]
@@ -19,7 +24,6 @@ pub struct ParentRequest {
     title: String,
     body: Option<String>,
     metadata: String,
-    uniqueId: String,
     category: String,
     image_url: Option<String>,
 }
@@ -66,7 +70,8 @@ pub async fn create(
 
     let auth = session.user_info()?;
     let auth_id = Uuid::parse_str(&auth.userId)?;
-    let unique_id = Uuid::parse_str(&request.uniqueId)?;
+    let unique_id = time_uuid();
+    let unique__id = unique_id.to_string();
     let batch_values = (
         (&unique_id, &auth_id, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id),
         (&unique_id, &unique_id, &auth_id, &request.title, &body, &image_url, &identity, &request.metadata, &unique_id, &unique_id),
@@ -82,8 +87,8 @@ pub async fn create(
 
     Ok(
         HttpResponse::Ok().json(ParentResponse {
-            bookId: request.uniqueId.clone(),
-            uniqueId: request.uniqueId.clone(),
+            bookId: unique__id.clone(),
+            uniqueId: unique__id.clone(),
             parentId: None,
             title: request.title.clone(),
             body: body.clone(),
@@ -91,8 +96,8 @@ pub async fn create(
             identity,
             authorId: auth_id.to_string(),
             metadata: request.metadata.clone(),
-            createdAt: request.uniqueId.clone(),
-            updatedAt: request.uniqueId.clone(),
+            createdAt: unique__id.clone(),
+            updatedAt: unique__id.clone(),
         })
     )
 }

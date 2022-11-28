@@ -54,6 +54,15 @@ CREATE TABLE categorybooks (
     updatedAt timeuuid,
     PRIMARY KEY (category, bookId)
 ) WITH CLUSTERING ORDER BY (bookId DESC);
+
+SELECT COUNT(*) FROM books;
+
+TRUNCATE TABLE sankar.books;
+TRUNCATE TABLE sankar.book;
+TRUNCATE TABLE sankar.userbooks;
+TRUNCATE TABLE sankar.categorybooks;
+
+
 CREATE TABLE updatebooknode (
     bookId timeuuid,
     uniqueId timeuuid,
@@ -65,12 +74,3 @@ CREATE TABLE updatebooknode (
     updatedAt timeuuid,
     PRIMARY KEY ((bookId, parentId), uniqueId)
 ) WITH CLUSTERING ORDER BY (uniqueId DESC);
-
-SELECT COUNT(*) FROM books;
-
-
-TRUNCATE TABLE sankar.books;
-TRUNCATE TABLE sankar.book;
-TRUNCATE TABLE sankar.userbooks;
-TRUNCATE TABLE sankar.categorybooks;
-

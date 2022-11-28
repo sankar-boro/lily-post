@@ -1,15 +1,16 @@
+use crate::utils::ParseUuid;
+use crate::{App, auth::AuthSession};
+use crate::query::{CREATE_BOOK_NODE_QUERY};
+
+use uuid::Uuid;
+use lily_utils::time_uuid;
+use actix_session::Session;
+use scylla::macros::FromRow;
 use actix_web::{HttpResponse, web};
 use serde::{Serialize, Deserialize};
-use uuid::Uuid;
-use crate::{App, auth::AuthSession};
-use crate::utils::ParseUuid;
-use scylla::macros::FromRow;
-use crate::query::{CREATE_BOOK_NODE_QUERY};
-use actix_session::Session;
 
 #[derive(Deserialize, FromRow)]
 pub struct AppendNodeRequest {
-    uniqueId: String,
     title: String,
     body: String,
     identity: i16,
@@ -33,8 +34,9 @@ pub async fn create(
 {   
     let auth = session.user_info()?;
     let author_id = Uuid::parse_str(&auth.userId)?;
-    let new_id = &payload.uniqueId;
-    let new_id = new_id.to_uuid()?;
+    let new_id = time_uuid();
+    let new_id = new_id.to_string();
+    let new__id = new_id.to_string();
     let book_id = &payload.bookId.to_uuid()?;
     let top_unique_id = &payload.topUniqueId.to_uuid()?;
     let mut image_url = None;
@@ -56,6 +58,6 @@ pub async fn create(
     );
     app.query(CREATE_BOOK_NODE_QUERY, create_data).await?;
     Ok(HttpResponse::Ok().json(Response {
-        uniqueId: payload.uniqueId.to_owned()
+        uniqueId: new__id.clone()
     }))
 }

@@ -1,20 +1,21 @@
-use actix_web::{HttpResponse, web};
+use crate::{App};
+use crate::{auth::AuthSession};
+
 use scylla::{
     batch::Batch, 
     frame::value::BatchValues,
     BatchResult
 };
-use serde::{Serialize, Deserialize};
 use uuid::Uuid;
-use crate::{App, utils::ParseUuid};
 use validator::Validate;
-use scylla::macros::FromRow;
+use lily_utils::time_uuid;
 use actix_session::Session;
-use crate::{auth::AuthSession};
+use scylla::macros::FromRow;
+use actix_web::{HttpResponse, web};
+use serde::{Serialize, Deserialize};
 
 #[derive(Deserialize, Validate, FromRow)]
 pub struct MergeNodeRequest {
-    uniqueId: String,
     title: String,
     body: String,
     identity: i16,
@@ -51,8 +52,8 @@ impl MergeNodeRequest {
         let author_id = Uuid::parse_str(&auth.userId)?;
 
         // Create and parse elements
-        let new_id = &self.uniqueId;
-        let new_id = new_id.to_uuid()?;
+        let new_id = time_uuid();
+        let new__id = new_id.to_string();
         let book_id = Uuid::parse_str(&self.bookId)?;
         let top_unique_id = Uuid::parse_str(&self.topUniqueId)?;
         let bot_unique_id = Uuid::parse_str(&self.botUniqueId)?;
@@ -89,7 +90,7 @@ impl MergeNodeRequest {
         self.batch(app, batch_values).await?;
 
         Ok(HttpResponse::Ok().json(Response {
-            uniqueId: self.uniqueId.to_owned()
+            uniqueId: new__id.clone()
         }))
     }
 }
