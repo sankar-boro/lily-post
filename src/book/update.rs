@@ -1,5 +1,5 @@
 use actix_web::{HttpResponse, web};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use crate::App;
 use validator::Validate;
 use scylla::macros::FromRow;
@@ -10,7 +10,7 @@ use actix_session::Session;
 use crate::auth::AuthSession;
 
 
-#[derive(Deserialize, Validate, FromRow)]
+#[derive(Deserialize, Validate, FromRow, Serialize, Clone)]
 pub struct UpdateRequest {
     title: String,
     body: String,
@@ -51,5 +51,5 @@ pub async fn update(
             (&payload.title, &payload.body, &payload.metadata, &payload.category, &bookId),
         )
     ).await?;
-    Ok(HttpResponse::Ok().body("Updated".to_string()))
+    Ok(HttpResponse::Ok().json(payload.clone()))
 }

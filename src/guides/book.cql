@@ -30,7 +30,7 @@ CREATE TABLE book (
     createdAt timeuuid,
     updatedAt timeuuid,
     PRIMARY KEY (bookId, uniqueId)
-) WITH CLUSTERING ORDER BY (uniqueId DESC);
+);
 CREATE TABLE userbooks (
     bookId timeuuid,
     authorId timeuuid,

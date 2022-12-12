@@ -29,7 +29,7 @@ CREATE TABLE blog (
     createdAt timeuuid,
     updatedAt timeuuid,
     PRIMARY KEY (blogId, uniqueId)
-) WITH CLUSTERING ORDER BY (uniqueId DESC);
+);
 CREATE TABLE userblogs (
     blogId timeuuid,
     authorId timeuuid,

@@ -1,5 +1,5 @@
 use actix_web::{HttpResponse, web};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use crate::App;
 use scylla::batch::Batch;
 use scylla::query::Query;
@@ -8,16 +8,16 @@ use actix_session::Session;
 use crate::auth::AuthSession;
 
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct UpdateRequest {
     bookId: String,
     uniqueId: String,
     category: String,
     createdAt: String,
-    value: String,
+    url: String,
 }
 
-pub async fn update_key_value(
+pub async fn update_image_url(
     app: web::Data<App>, 
     payload: web::Json<UpdateRequest>,
     session: Session
@@ -41,11 +41,11 @@ pub async fn update_key_value(
     batch.append_statement(userBooksQuery);
     batch.append_statement(categoryBooksQuery);
     app.batch(&batch, (
-            (&payload.value, &bookId, &uniqueId),
-            (&payload.value, &bookId, &created_at),
-            (&payload.value, &auth_id, &bookId),
-            (&payload.value, &payload.category, &bookId),
+            (&payload.url, &bookId, &uniqueId),
+            (&payload.url, &bookId, &created_at),
+            (&payload.url, &auth_id, &bookId),
+            (&payload.url, &payload.category, &bookId),
         )
     ).await?;
-    Ok(HttpResponse::Ok().body("Updated".to_string()))
+    Ok(HttpResponse::Ok().json(payload))
 }

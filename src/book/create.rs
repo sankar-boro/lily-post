@@ -68,6 +68,10 @@ pub async fn create(
         image_url = Some(b.to_owned());
     }
 
+    if &request.title.len() < &2 {
+        return Err(crate::AppError::from("title to small").into());
+    }
+
     let auth = session.user_info()?;
     let auth_id = Uuid::parse_str(&auth.userId)?;
     let unique_id = time_uuid();

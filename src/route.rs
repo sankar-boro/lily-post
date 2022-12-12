@@ -27,7 +27,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
     .route("/update", web::post().to(book::update))
     .route("/settings/create", web::post().to(settings::create))
     .route("/settings/update", web::post().to(settings::update))
-    .route("/update_key_value", web::post().to(book::update_key_value))
+    .route("/update_image_url", web::post().to(book::update_image_url))
   );
   
   config.service(
@@ -47,6 +47,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
     .route("/create", web::post().to(blog::create))
     .route("/delete/{deleteId}/{category}", web::post().to(blog::delete))
     .route("/update", web::post().to(blog::update))
+    .route("/update_image_url", web::post().to(blog::update_image_url))
   );
   config.service(
     web::scope("/blognode")
