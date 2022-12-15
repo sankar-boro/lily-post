@@ -39,6 +39,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
     .route("/delete/update", web::post().to(booknode::deleteAndUpdate))
     .route("/update", web::post().to(booknode::update))
     .route("/pull_request", web::post().to(booknode::pull_request))
+    .route("/update_image_url_node", web::post().to(booknode::update_image_url_node))
   );
 
   config.service(
@@ -57,6 +58,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
     .route("/delete", web::post().to(blognode::delete))
     .route("/delete/update", web::post().to(blognode::deleteAndUpdate))
     .route("/update", web::post().to(blognode::update))
+    .route("/update_image_url_node", web::post().to(blognode::update_image_url_node))
   );
 
 }
