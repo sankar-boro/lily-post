@@ -43,7 +43,7 @@ pub async fn update_image_url_node(
     let blogId = Uuid::parse_str(&payload.blogId)?;
     let uniqueId = Uuid::parse_str(&payload.uniqueId)?;
 
-    let query = format!("UPDATE sankar.book SET url=? WHERE blogId=? AND uniqueId=?");
+    let query = format!("UPDATE sankar.blog SET url=? WHERE blogId=? AND uniqueId=?");
     app.query(query, (&payload.url, &blogId, &uniqueId)).await?;
     Ok(HttpResponse::Ok().json(payload))
 }
