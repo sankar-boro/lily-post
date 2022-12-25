@@ -1,11 +1,14 @@
 use crate::utils::ParseUuid;
 use crate::{App, auth::AuthSession};
-use crate::query::{CREATE_BOOK_NODE_QUERY};
+use crate::query::{CREATE_BOOK_NODE_QUERY, CREATE_BOOK_TITLE};
 
 use uuid::Uuid;
 use lily_utils::time_uuid;
 use actix_session::Session;
-use scylla::macros::FromRow;
+use scylla::{
+    batch::Batch,
+    macros::FromRow
+};
 use actix_web::{HttpResponse, web};
 use serde::{Serialize, Deserialize};
 
@@ -15,6 +18,7 @@ pub struct AppendNodeRequest {
     body: String,
     identity: i16,
     bookId: String,
+    pageId: Option<String>,
     topUniqueId: String,
     metadata: String,
     image_url: Option<String>,
@@ -32,9 +36,23 @@ pub async fn create(
 ) 
 -> Result<HttpResponse, crate::AppError> 
 {   
+
+    let mut batch: Batch = Default::default();
+    batch.append_statement(CREATE_BOOK_NODE_QUERY);
+    batch.append_statement(CREATE_BOOK_TITLE);
+
     let auth = session.user_info()?;
     let author_id = Uuid::parse_str(&auth.userId)?;
     let new_id = time_uuid();
+    let mut page_id = None;
+    if &payload.identity == &104 {
+        page_id = Some(time_uuid());
+    } else {
+        if let Some(pageId) = &payload.pageId {
+            page_id = Some(pageId.to_uuid()?);
+        }
+    }
+
     let new__id = new_id.to_string();
     let book_id = &payload.bookId.to_uuid()?;
     let top_unique_id = &payload.topUniqueId.to_uuid()?;
@@ -42,20 +60,19 @@ pub async fn create(
     if let Some(b) = &payload.image_url {
         image_url = Some(b.to_owned());
     }
-    let create_data = ( 
-        &book_id,
-        &new_id,
-        &top_unique_id,
-        &author_id,
-        &payload.title,
-        &payload.body,
-        &payload.metadata,
-        &image_url,
-        &payload.identity,
-        &new_id,
-        &new_id
+    
+    let batch_values = ( 
+        (
+            &book_id,&page_id,&new_id,&top_unique_id,&author_id,&payload.title,
+            &payload.body,&payload.metadata,&image_url,&payload.identity,&new_id,&new_id
+        ),
+        (
+            &book_id, &top_unique_id, &new_id, &payload.title, &payload.identity
+        )
     );
-    app.query(CREATE_BOOK_NODE_QUERY, create_data).await?;
+    app.batch(&batch, &batch_values).await?;
+
+    // app.query(CREATE_BOOK_NODE_QUERY, create_data).await?;
     Ok(HttpResponse::Ok().json(Response {
         uniqueId: new__id.clone()
     }))

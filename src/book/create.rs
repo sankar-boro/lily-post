@@ -2,7 +2,7 @@ use crate::auth::AuthSession;
 use crate::{
     App, 
     query::{
-        CREATE_BOOKS, CREATE_BOOK, CREATE_USER_BOOKS, 
+        CREATE_BOOKS, CREATE_BOOK, CREATE_BOOK_TITLE, CREATE_USER_BOOKS, 
         CREATE_CATEGORY_BOOKS, CREATE_ALLCATEGORY 
     }
 };
@@ -29,8 +29,9 @@ pub struct ParentRequest {
 }
 
 #[derive(Serialize, Validate, FromRow)]
-pub struct ParentResponse {
+pub struct CreateBookResponse {
     bookId: String,
+    pageId: String,
     uniqueId: String,
     parentId: Option<String>,
     authorId: String,
@@ -56,6 +57,7 @@ pub async fn create(
     batch.append_statement(CREATE_BOOK);
     batch.append_statement(CREATE_USER_BOOKS);
     batch.append_statement(CREATE_CATEGORY_BOOKS);
+    batch.append_statement(CREATE_BOOK_TITLE);
     let identity: i16 = 101;
 
     let mut body = String::from("");
@@ -77,10 +79,16 @@ pub async fn create(
     let unique_id = time_uuid();
     let unique__id = unique_id.to_string();
     let batch_values = (
+        // CREATE_BOOKS
         (&unique_id, &auth_id, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id),
-        (&unique_id, &unique_id, &auth_id, &request.title, &body, &image_url, &identity, &request.metadata, &unique_id, &unique_id),
+        // CREATE_BOOK
+        (&unique_id, &unique_id, &unique_id, &auth_id, &request.title, &body, &image_url, &identity, &request.metadata, &unique_id, &unique_id),
+        // CREATE_USER_BOOKS
         (&unique_id, &auth_id, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id),
-        (&request.category, &unique_id, &auth_id, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id)
+        // CREATE_CATEGORY_BOOKS
+        (&request.category, &unique_id, &auth_id, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id),
+        // CREATE_BOOK_TITLE
+        (&unique_id, &unique_id, &unique_id, &request.title, &identity)
     );
 
     app.batch(&batch, &batch_values).await?;
@@ -90,8 +98,9 @@ pub async fn create(
     // a.create_document(&request.title, &request.body);
 
     Ok(
-        HttpResponse::Ok().json(ParentResponse {
+        HttpResponse::Ok().json(CreateBookResponse {
             bookId: unique__id.clone(),
+            pageId: unique__id.clone(),
             uniqueId: unique__id.clone(),
             parentId: None,
             title: request.title.clone(),

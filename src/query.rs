@@ -20,9 +20,9 @@ macro_rules! create_query {
 }
 
 pub static CREATE_BOOK_NODE_QUERY: &str = "INSERT INTO sankar.book (
-    bookId, uniqueId, parentId, authorId, title, body, metadata, url, identity, createdAt, updatedAt
+    bookId, pageId, uniqueId, parentId, authorId, title, body, metadata, url, identity, createdAt, updatedAt
 ) VALUES(
-    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 )";
 
 pub static CREATE_BLOG_NODE_QUERY: &str = "INSERT INTO sankar.blog (
@@ -40,9 +40,14 @@ pub static CREATE_BOOKS: &str = "INSERT INTO sankar.books (
  * We dont include parentId, because the first node is the parent node.
  */
 pub static CREATE_BOOK: &str = "INSERT INTO sankar.book (
-    bookId, uniqueId, authorId, title, body, url, identity, metadata, createdAt, updatedAt
+    bookId, pageId, uniqueId, authorId, title, body, url, identity, metadata, createdAt, updatedAt
 ) VALUES(
-    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+)";
+pub static CREATE_BOOK_TITLE: &str = "INSERT INTO sankar.book_title (
+    bookId, parentId, uniqueId, title, identity
+) VALUES(
+    ?, ?, ?, ?, ?
 )";
 pub static CREATE_USER_BOOKS: &str = "INSERT INTO sankar.userbooks (
     bookId, authorId, title, body, url, metadata, createdAt, updatedAt
