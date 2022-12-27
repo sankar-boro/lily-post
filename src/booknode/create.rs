@@ -45,8 +45,8 @@ pub async fn create(
     let author_id = Uuid::parse_str(&auth.userId)?;
     let new_id = time_uuid();
     let mut page_id = None;
-    if &payload.identity == &104 {
-        page_id = Some(time_uuid());
+    if payload.identity == 104 {
+        page_id = Some(new_id.clone());
     } else {
         if let Some(pageId) = &payload.pageId {
             page_id = Some(pageId.to_uuid()?);
