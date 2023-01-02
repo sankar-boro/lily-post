@@ -72,6 +72,7 @@ TRUNCATE TABLE sankar.books;
 TRUNCATE TABLE sankar.book;
 TRUNCATE TABLE sankar.userbooks;
 TRUNCATE TABLE sankar.categorybooks;
+TRUNCATE TABLE sankar.book_title;
 
 
 CREATE TABLE updatebooknode (

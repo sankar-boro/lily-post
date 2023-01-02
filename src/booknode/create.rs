@@ -27,6 +27,7 @@ pub struct AppendNodeRequest {
 #[derive(Serialize)]
 pub struct Response {
     uniqueId: String,
+    pageId: Option<String>,
 }
 
 pub async fn create(
@@ -74,6 +75,7 @@ pub async fn create(
 
     // app.query(CREATE_BOOK_NODE_QUERY, create_data).await?;
     Ok(HttpResponse::Ok().json(Response {
-        uniqueId: new__id.clone()
+        uniqueId: new__id.clone(),
+        pageId: page_id.map(|d: Uuid| d.to_string())
     }))
 }

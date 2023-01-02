@@ -1,5 +1,7 @@
 use crate::{App};
 use crate::{auth::AuthSession};
+use crate::utils::ParseUuid;
+use crate::query::CREATE_BOOK_TITLE;
 
 use scylla::{
     batch::Batch, 
@@ -20,6 +22,7 @@ pub struct MergeNodeRequest {
     body: String,
     identity: i16,
     bookId: String,
+    pageId: Option<String>,
     metadata: String,
     topUniqueId: String,
     botUniqueId: String,
@@ -29,14 +32,16 @@ pub struct MergeNodeRequest {
 #[derive(Serialize)]
 pub struct Response {
     uniqueId: String,
+    pageId: String,
 }
 
-pub static UPDATE_PARENT_ID: &str = "UPDATE sankar.book SET parentId=? WHERE bookId=? AND uniqueId=?";
+pub static UPDATE_PARENT_ID: &str = "UPDATE sankar.book SET parentId=? WHERE bookId=? AND pageId=? AND uniqueId=?";
 pub static CHILD: &str = "INSERT INTO sankar.book (
-    bookId, uniqueId, parentId, authorId, title, body, identity, metadata, url, createdAt, updatedAt
+    bookId, pageId, uniqueId, parentId, authorId, title, body, identity, metadata, url, createdAt, updatedAt
 ) VALUES(
-    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 )";
+pub static UPDATE_PARENT_TITLE: &str = "UPDATE sankar.book_title SET parentId=? WHERE bookId=? AND uniqueId=?";
 
 impl MergeNodeRequest {
 
@@ -44,6 +49,9 @@ impl MergeNodeRequest {
         let mut batch: Batch = Default::default();
         batch.append_statement(UPDATE_PARENT_ID);
         batch.append_statement(CHILD);
+        batch.append_statement(CREATE_BOOK_TITLE);
+        batch.append_statement(UPDATE_PARENT_TITLE);
+
         Ok(app.batch(&batch, batch_values).await?)
     }
 
@@ -63,9 +71,19 @@ impl MergeNodeRequest {
             image_url = Some(b.to_owned());
         }
 
+        let mut page_id = None;
+        if self.identity == 104 {
+            page_id = Some(new_id.clone());
+        } else {
+            if let Some(pageId) = &self.pageId {
+                page_id = Some(pageId.to_uuid()?);
+            }
+        }
+        
         // Create data
         let create_data = ( 
             &book_id,
+            &page_id,
             &new_id,
             &top_unique_id,
             &author_id,
@@ -81,16 +99,30 @@ impl MergeNodeRequest {
         let update_data = (
             &new_id,
             &book_id,
+            &page_id,
+            bot_unique_id
+        );
+
+        let create_title = (
+            &book_id, &top_unique_id, &new_id, &self.title, &self.identity
+        );
+        let update_title = (
+            &new_id,
+            &book_id,
             bot_unique_id
         );
         let batch_values = (
             update_data,
-            create_data
+            create_data,
+            create_title,
+            update_title
         );
+        
         self.batch(app, batch_values).await?;
 
         Ok(HttpResponse::Ok().json(Response {
-            uniqueId: new__id.clone()
+            uniqueId: new__id.clone(),
+            pageId: page_id.unwrap().to_string(),
         }))
     }
 }
