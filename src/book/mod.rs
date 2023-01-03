@@ -1,10 +1,10 @@
 mod create;
 mod delete;
 mod update;
-mod segment;
+mod image;
 
 pub use create::{create};
-pub use segment::update_image_url;
+pub use image::update_image;
 
 pub use delete::delete;
 pub use update::update;

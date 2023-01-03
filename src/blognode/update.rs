@@ -1,9 +1,9 @@
-use actix_web::{HttpResponse, web};
-use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 use crate::App;
 use validator::Validate;
+use serde::{Deserialize};
 use scylla::macros::FromRow;
-use uuid::Uuid;
+use actix_web::{HttpResponse, web};
 
 #[derive(Deserialize, Validate, FromRow)]
 pub struct UpdateRequest {
@@ -25,25 +25,4 @@ pub async fn update(
     let query = format!("UPDATE sankar.blog SET title=?, body=?, metadata=? WHERE blogId=? AND uniqueId=?");
     app.query(query, (&payload.title, &payload.body, &payload.metadata, &blogId, &uniqueId)).await?;
     Ok(HttpResponse::Ok().body("Updated".to_string()))
-}
-
-#[derive(Deserialize, Serialize, Clone)]
-pub struct UpdateNodeRequest {
-    blogId: String,
-    uniqueId: String,
-    url: String,
-}
-
-pub async fn update_image_url_node(
-    app: web::Data<App>, 
-    payload: web::Json<UpdateNodeRequest>
-) 
--> Result<HttpResponse, crate::AppError> 
-{   
-    let blogId = Uuid::parse_str(&payload.blogId)?;
-    let uniqueId = Uuid::parse_str(&payload.uniqueId)?;
-
-    let query = format!("UPDATE sankar.blog SET url=? WHERE blogId=? AND uniqueId=?");
-    app.query(query, (&payload.url, &blogId, &uniqueId)).await?;
-    Ok(HttpResponse::Ok().json(payload))
 }

@@ -17,7 +17,7 @@ pub struct UpdateRequest {
     url: String,
 }
 
-pub async fn update_image_url(
+pub async fn update_image(
     app: web::Data<App>, 
     payload: web::Json<UpdateRequest>,
     session: Session
@@ -32,12 +32,10 @@ pub async fn update_image_url(
 
     let mut batch: Batch = Default::default();
     let blogQuery = Query::from(format!("UPDATE sankar.blog SET url=? WHERE blogId=? AND uniqueId=?"));
-    let blogsQuery = Query::from(format!("UPDATE sankar.blogs SET url=? WHERE blogId=? AND createdAt=?"));
     let userBlogsQuery = Query::from(format!("UPDATE sankar.userblogs SET url=? WHERE authorId=? AND blogId=?"));
     let categoryBlogsQuery = Query::from(format!("UPDATE sankar.categoryblogs SET url=? WHERE category=? AND blogId=?"));
 
     batch.append_statement(blogQuery);
-    batch.append_statement(blogsQuery);
     batch.append_statement(userBlogsQuery);
     batch.append_statement(categoryBlogsQuery);
     app.batch(&batch, (
