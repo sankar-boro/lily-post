@@ -15,6 +15,7 @@ pub struct UpdateBookImage {
     pageId: String,
     category: String,
     image_url: String,
+    createdAt: String,
 }
 
 pub async fn update_image(
@@ -29,19 +30,23 @@ pub async fn update_image(
     let bookId = Uuid::parse_str(&payload.bookId)?;
     let uniqueId = Uuid::parse_str(&payload.uniqueId)?;
     let pageId = Uuid::parse_str(&payload.pageId)?;
+    let created_at = Uuid::parse_str(&payload.createdAt)?;
 
     let bookQuery = Query::from(format!("UPDATE sankar.book SET url=? WHERE bookId=? AND pageId=? AND uniqueId=?"));
+    let booksQuery = Query::from(format!("UPDATE sankar.books SET url=? WHERE bookId=? AND createdAt=?"));
     let userBooksQuery = Query::from(format!("UPDATE sankar.userbooks SET url=? WHERE authorId=? AND bookId=?"));
     let categoryBooksQuery = Query::from(format!("UPDATE sankar.categorybooks SET url=? WHERE category=? AND bookId=?"));
     
     let mut batch: Batch = Default::default();
     batch.append_statement(bookQuery);
+    batch.append_statement(booksQuery);
     batch.append_statement(userBooksQuery);
     batch.append_statement(categoryBooksQuery);
     app.batch(&batch, (
-        (&payload.image_url, &bookId, &pageId, &uniqueId),
-        (&payload.image_url, &auth_id, &bookId),
-        (&payload.image_url, &payload.category, &bookId),
+        (&payload.image_url, &bookId, &pageId, &uniqueId), // book
+        (&payload.image_url, &bookId, &created_at), // books
+        (&payload.image_url, &auth_id, &bookId), // userbooks
+        (&payload.image_url, &payload.category, &bookId), // categorybooks
     )).await?;
 
     Ok(HttpResponse::Ok().json(payload))

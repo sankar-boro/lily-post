@@ -5,7 +5,6 @@ DROP TABLE IF EXISTS books;
 DROP TABLE IF EXISTS userbooks;
 DROP TABLE IF EXISTS book_title;
 DROP TABLE IF EXISTS categorybooks;
-DROP TABLE IF EXISTS updatebooknode;
 
 CREATE TABLE books (
     bookId timeuuid,
@@ -18,6 +17,7 @@ CREATE TABLE books (
     updatedAt timeuuid,
     PRIMARY KEY (bookId, createdAt)
 ) WITH CLUSTERING ORDER BY (createdAt DESC);
+-- table books is used for rendering books when user is not logged in.
 CREATE TABLE book (
     bookId timeuuid,
     pageId timeuuid,
