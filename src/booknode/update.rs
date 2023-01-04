@@ -4,6 +4,9 @@ use crate::App;
 use validator::Validate;
 use scylla::macros::FromRow;
 use uuid::Uuid;
+use scylla::batch::Batch;
+use scylla::query::Query;
+
 
 #[derive(Deserialize, Validate, FromRow)]
 pub struct UpdateRequest {
@@ -25,8 +28,18 @@ pub async fn update(
     let uniqueId = Uuid::parse_str(&payload.uniqueId)?;
     let pageId = Uuid::parse_str(&payload.pageId)?;
 
-    let query = format!("UPDATE sankar.book SET title=?, body=?, metadata=? WHERE bookId=? AND pageId=? AND uniqueId=?");
-    app.query(query, (&payload.title, &payload.body, &payload.metadata, &bookId, &pageId, &uniqueId)).await?;
+    let book_query = Query::new(format!("UPDATE sankar.book SET title=?, body=?, metadata=? WHERE bookId=? AND pageId=? AND uniqueId=?"));
+    let title_query = Query::new(format!("UPDATE sankar.book_title SET title=? WHERE bookId=? AND uniqueId=?"));
+
+    let mut batch: Batch = Default::default();
+    batch.append_statement(book_query);
+    batch.append_statement(title_query);
+
+    app.batch(&batch, (
+        (&payload.title, &payload.body, &payload.metadata, &bookId, &pageId, &uniqueId), 
+        (&payload.title, &bookId, &uniqueId)
+    )).await?;
+
     
     Ok(HttpResponse::Ok().body("Updated".to_string()))
 }

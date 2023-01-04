@@ -23,7 +23,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
     web::scope("/book")
     .wrap(Authentication{})
     .route("/create", web::post().to(book::create))
-    .route("/delete/{deleteId}/{category}", web::post().to(book::delete))
+    .route("/delete", web::post().to(book::delete))
     .route("/update", web::post().to(book::update))
     .route("/settings/create", web::post().to(settings::create))
     .route("/settings/update", web::post().to(settings::update))
