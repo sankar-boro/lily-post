@@ -2,31 +2,53 @@ use uuid::Uuid;
 use crate::App;
 use serde::Deserialize;
 use actix_web::{web, HttpResponse};
+use scylla::query::Query;
+use scylla::batch::Batch;
 
 #[derive(Deserialize)]
-pub struct DeleteNodeRequest {
+pub struct DeleteBookNodeRequest {
     bookId: String,
-    deleteData: Vec<String>,
+    pageId: String,
+    bookNodes: Vec<String>,
+    titleNodes: Vec<String>,
 }
 
 pub async fn delete(
     app: web::Data<App>, 
-    payload: web::Json<DeleteNodeRequest>
+    payload: web::Json<DeleteBookNodeRequest>
 ) -> Result<HttpResponse, crate::AppError> {
     let book_id = Uuid::parse_str(&payload.bookId)?;
-    let deleteData = &payload.deleteData;
-    let mut deleteData = deleteData.iter();
-    
-    let mut uniqueIds = String::from("");
-    if let Some(id) = deleteData.next() {
-        uniqueIds.push_str(id);
+    let page_id = Uuid::parse_str(&payload.pageId)?;
+
+    let book_nodes = &payload.bookNodes;
+    let mut book_nodes = book_nodes.iter();
+    let mut bookNodesIds = String::from("");
+    if let Some(id) = book_nodes.next() {
+        bookNodesIds.push_str(id);
     }
-    while let Some(id) = deleteData.next() {
-        uniqueIds.push_str(&format!(", {}", &id));
+    while let Some(id) = book_nodes.next() {
+        bookNodesIds.push_str(&format!(", {}", &id));
     }
 
-    let query = format!("DELETE FROM sankar.book WHERE bookId={} AND uniqueId IN ({})", &book_id, &uniqueIds);
+    let titleNodes = &payload.titleNodes;
+    let mut titleNodes = titleNodes.iter();
+    let mut titleNodeIds = String::from("");
+    if let Some(id) = titleNodes.next() {
+        titleNodeIds.push_str(id);
+    }
+    while let Some(id) = titleNodes.next() {
+        titleNodeIds.push_str(&format!(", {}", &id));
+    }
 
-    app.query(query, &[]).await?;
+    let query_book = Query::new(format!("DELETE FROM sankar.book WHERE bookId={} AND pageId={} AND uniqueId IN ({})", &book_id, &page_id, &bookNodesIds));
+    let query_title = Query::new(format!("DELETE FROM sankar.book_title WHERE bookId={} AND uniqueId IN ({})", &book_id, &titleNodeIds));
+
+    let mut batch: Batch = Default::default();
+    batch.append_statement(query_book);
+    batch.append_statement(query_title);
+
+    let batch_values = ((),());
+    // app.query(query, &[]).await?;
+    app.batch(&batch, &batch_values).await?;
     Ok(HttpResponse::Ok().body("Deleted."))
 }
