@@ -6,7 +6,7 @@ use actix_web::{web, HttpResponse};
 #[derive(Deserialize)]
 pub struct DeleteNodeRequest {
     blogId: String,
-    deleteData: Vec<String>,
+    blogNodes: Vec<String>,
 }
 
 pub async fn delete(
@@ -14,14 +14,14 @@ pub async fn delete(
     payload: web::Json<DeleteNodeRequest>
 ) -> Result<HttpResponse, crate::AppError> {
     let blog_id = Uuid::parse_str(&payload.blogId)?;
-    let deleteData = &payload.deleteData;
-    let mut deleteData = deleteData.iter();
+    let blogNodes = &payload.blogNodes;
+    let mut blogNodes = blogNodes.iter();
     
     let mut uniqueIds = String::from("");
-    if let Some(id) = deleteData.next() {
+    if let Some(id) = blogNodes.next() {
         uniqueIds.push_str(id);
     }
-    while let Some(id) = deleteData.next() {
+    while let Some(id) = blogNodes.next() {
         uniqueIds.push_str(&format!(", {}", &id));
     }
 

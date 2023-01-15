@@ -5,6 +5,13 @@ use scylla::batch::Batch;
 use actix_session::Session;
 use crate::auth::AuthSession;
 use crate::utils::ParseUuid;
+use serde::{Deserialize};
+
+#[derive(Deserialize)]
+pub struct DeleteBlogRequest {
+    blogId: String,
+    category: String
+}
 
 pub static DELETE_BLOGS: &str = "DELETE FROM sankar.blogs where blogId=?";
 pub static DELETE_BLOG: &str = "DELETE FROM sankar.blog where blogId=?";
@@ -13,11 +20,11 @@ pub static DELETE_CATEGORYBLOGS: &str = "DELETE FROM sankar.categoryblogs where 
 
 pub async fn delete(
     app: web::Data<App>,
-    blogInfo: web::Path<(String, String)>,
+    payload: web::Json<DeleteBlogRequest>,
     session: Session
 ) -> Result<HttpResponse, crate::AppError> {
-    let blog_id = Uuid::parse_str(&blogInfo.0)?;
-    let category = &blogInfo.1;
+    let blog_id = Uuid::parse_str(&payload.blogId)?;
+    let category = &payload.category;
     let auth = session.user_info()?;
     let auth_id = &auth.userId.to_uuid()?;
 

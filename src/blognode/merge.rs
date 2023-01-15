@@ -16,7 +16,6 @@ use serde::{Serialize, Deserialize};
 pub struct MergeNodeRequest {
     title: String,
     body: String,
-    identity: i16,
     blogId: String,
     metadata: String,
     topUniqueId: String,
@@ -52,7 +51,7 @@ pub async fn merge(
     let blog_id = Uuid::parse_str(&payload.blogId)?;
     let top_unique_id = Uuid::parse_str(&payload.topUniqueId)?;
     let bot_unique_id = Uuid::parse_str(&payload.botUniqueId)?;
-
+    let identity: i16 = 104;
     let mut image_url = None;
     if let Some(b) = &payload.image_url {
         image_url = Some(b.to_owned());
@@ -66,7 +65,7 @@ pub async fn merge(
         &author_id,
         &payload.title,
         &payload.body,
-        &payload.identity,
+        &identity,
         &payload.metadata,
         &image_url,
         &new_id,

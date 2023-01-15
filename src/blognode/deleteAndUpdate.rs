@@ -15,7 +15,7 @@ struct UpdateData {
 pub struct UpdateOrDelete {
     blogId: String,
     updateData: UpdateData,
-    deleteData: Vec<String>,
+    blogNodes: Vec<String>,
 }
 
 pub async fn deleteAndUpdate(
@@ -38,13 +38,13 @@ pub async fn deleteAndUpdate(
     batch.append_statement(query); // append query
 
     // delete query
-    let deleteData = &payload.deleteData;
-    let mut deleteData = deleteData.iter();
+    let blogNodes = &payload.blogNodes;
+    let mut blogNodes = blogNodes.iter();
     let mut uniqueIds = String::from("");
-    if let Some(id) = deleteData.next() {
+    if let Some(id) = blogNodes.next() {
         uniqueIds.push_str(id);
     }
-    while let Some(id) = deleteData.next() {
+    while let Some(id) = blogNodes.next() {
         uniqueIds.push_str(&format!(", {}", &id));
     }
     let query = Query::new(format!(

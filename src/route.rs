@@ -46,7 +46,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
     web::scope("/blog")
     .wrap(Authentication{})
     .route("/create", web::post().to(blog::create))
-    .route("/delete/{deleteId}/{category}", web::post().to(blog::delete))
+    .route("/delete", web::post().to(blog::delete))
     .route("/update", web::post().to(blog::update))
     .route("/update_image", web::post().to(blog::update_image))
   );
