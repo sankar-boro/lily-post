@@ -36,6 +36,9 @@ use scylla::query::Query;
 use scylla::frame::value::ValueList;
 use scylla::frame::value::BatchValues;
 use scylla::transport::errors::QueryError;
+use deadpool_postgres::{Config, Manager, ManagerConfig, Pool, RecyclingMethod, Runtime};
+use tokio_postgres::NoTls;
+use std::env;
 
 #[derive(Clone)]
 pub struct App {
@@ -64,6 +67,8 @@ impl App {
 }
 
 async fn start_server(app: App) -> Result<()> {
+    let host = env::var("HOST").unwrap();
+    let port = env::var("PORT").unwrap();
 
     HttpServer::new(move || {
         let cors = Cors::default()
@@ -83,7 +88,7 @@ async fn start_server(app: App) -> Result<()> {
             .app_data(web::Data::new(app.clone()))
             .configure(route::routes)
     })
-    .bind("127.0.0.1:7501")?
+    .bind(format!("{}:{}", host, port))?
     .run()
     .await?;
     Ok(())
@@ -96,7 +101,21 @@ async fn main() {
     std::env::set_var("RUST_BACKTRACE", "1");
     env_logger::init();
     let uri = "127.0.0.1:9042";
+    let mut cfg = Config::new();
+    cfg.dbname = Some("sankar".to_string());
+    cfg.user = Some("sankar".to_string());
+    cfg.password = Some("sankar".to_string());
+    cfg.manager = Some(ManagerConfig { recycling_method: RecyclingMethod::Fast });
+    let pool = cfg.create_pool(Some(Runtime::Tokio1), NoTls).unwrap();
+    let mut client = pool.get().await.unwrap();
+        let stmt = client.prepare_cached("SELECT fname from users where user_id=1").await.unwrap();
+        let rows = client.query(&stmt, &[]).await.unwrap();
+        let value: String = rows[0].get(0);
+
+        println!("{}", value);
     let session = SessionBuilder::new().known_node(uri).build().await.unwrap();
+    
+
     let app = App::new(session);
     start_server(app).await.unwrap();
 }

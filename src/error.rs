@@ -26,14 +26,14 @@ impl Error {
     }
 }
 
-impl From<r2d2::Error> for Error {
-    fn from(e: r2d2::Error) -> Self {
-        Error {
-            status: StatusCode::INTERNAL_SERVER_ERROR,
-            message: e.to_string(),
-        }
-    }
-}
+// impl From<r2d2::Error> for Error {
+//     fn from(e: r2d2::Error) -> Self {
+//         Error {
+//             status: StatusCode::INTERNAL_SERVER_ERROR,
+//             message: e.to_string(),
+//         }
+//     }
+// }
 
 impl From<anyhow::Error> for Error {
     fn from(e: anyhow::Error) -> Self {
