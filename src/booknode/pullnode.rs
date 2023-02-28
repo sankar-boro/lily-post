@@ -33,7 +33,7 @@ pub async fn pull_request(
 {   
     let new_id = time_uuid();
     let auth = session.user_info()?;
-    let author_id = Uuid::parse_str(&auth.userId)?;
+    // let author_id = Uuid::parse_str(&auth.userId)?;
     let book_id = &payload.bookId.to_uuid()?;
     let parent_id = &payload.parentId.to_uuid()?;
 
@@ -41,7 +41,7 @@ pub async fn pull_request(
         &book_id,
         &new_id,
         &parent_id,
-        &author_id,
+        auth.userId,
         &payload.body,
         &payload.identity,
         &new_id,

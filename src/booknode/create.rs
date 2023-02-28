@@ -43,7 +43,6 @@ pub async fn create(
     batch.append_statement(CREATE_BOOK_TITLE);
 
     let auth = session.user_info()?;
-    let author_id = Uuid::parse_str(&auth.userId)?;
     let new_id = time_uuid();
     let mut page_id = None;
     if payload.identity == 104 {
@@ -64,7 +63,7 @@ pub async fn create(
     
     let batch_values = ( 
         (
-            &book_id,&page_id,&new_id,&top_unique_id,&author_id,&payload.title,
+            &book_id,&page_id,&new_id,&top_unique_id,&auth.userId,&payload.title,
             &payload.body,&payload.metadata,&image_url,&payload.identity,&new_id,&new_id
         ),
         (

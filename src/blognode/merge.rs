@@ -43,7 +43,7 @@ pub async fn merge(
 -> Result<HttpResponse, crate::AppError> 
 {   
     let auth = session.user_info()?;
-    let author_id = Uuid::parse_str(&auth.userId)?;
+    // let author_id = Uuid::parse_str(&auth.userId)?;
 
     // Create and parse elements
     let new_id = time_uuid();
@@ -62,7 +62,7 @@ pub async fn merge(
         &blog_id,
         &new_id,
         &top_unique_id,
-        &author_id,
+        auth.userId,
         &payload.title,
         &payload.body,
         &identity,

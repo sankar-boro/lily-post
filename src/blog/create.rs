@@ -27,7 +27,7 @@ pub struct ParentResponse {
     blogId: String,
     uniqueId: String,
     parentId: Option<String>,
-    authorId: String,
+    authorId: i32,
     title: String,
     body: String,
     url: Option<String>,
@@ -61,15 +61,15 @@ pub async fn create(
     }
 
     let auth = session.user_info()?;
-    let auth_id = &auth.userId.to_uuid()?;
+    // let auth_id = &auth.userId.to_uuid()?;
     let unique_id = time_uuid();
     let unique___id = unique_id.to_string();
 
     let batch_values = (
-        (&unique_id, &auth_id, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id),
-        (&unique_id, &unique_id, &auth_id, &request.title, &body, &image_url, &identity, &request.metadata, &unique_id, &unique_id),
-        (&unique_id, &auth_id, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id),
-        (&request.category, &unique_id, &auth_id, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id)
+        (&unique_id, auth.userId, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id),
+        (&unique_id, &unique_id, auth.userId, &request.title, &body, &image_url, &identity, &request.metadata, &unique_id, &unique_id),
+        (&unique_id, auth.userId, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id),
+        (&request.category, &unique_id, auth.userId, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id)
     );
     app.batch(&batch, &batch_values).await?;
     app.query(CREATE_ALLCATEGORY, (&request.category, "demo")).await?;
@@ -82,7 +82,7 @@ pub async fn create(
             body: body.clone(),
             url: image_url.clone(),
             identity,
-            authorId: auth_id.to_string(),
+            authorId: auth.userId,
             metadata: request.metadata.clone(),
             createdAt: unique___id.clone(),
             updatedAt: unique___id.clone(),

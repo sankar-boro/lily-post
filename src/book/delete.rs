@@ -28,7 +28,7 @@ pub async fn delete(
     let book_id = Uuid::parse_str(&payload.bookId)?;
     let category = &payload.category;
     let auth = session.user_info()?;
-    let auth_id = &auth.userId.to_uuid()?;
+    // let auth_id = &auth.userId.to_uuid()?;
     
     let deleteData = &payload.deleteData;
     let mut deleteData = deleteData.iter();
@@ -51,7 +51,7 @@ pub async fn delete(
     let batch_values = (
         (&book_id,), 
         (), 
-        (&auth_id, &book_id,), 
+        (auth.userId, &book_id,), 
         (&category, &book_id,), 
     );
     app.batch(&batch, &batch_values).await?;

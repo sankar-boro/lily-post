@@ -32,7 +32,7 @@ pub async fn update(
     let bookId = Uuid::parse_str(&payload.bookId)?;
     let uniqueId = Uuid::parse_str(&payload.uniqueId)?;
     let auth = session.user_info()?;
-    let auth_id = Uuid::parse_str(&auth.userId)?;
+    // let auth_id = Uuid::parse_str(&auth.userId)?;
     let created_at = Uuid::parse_str(&payload.createdAt)?;
     let page_id = Uuid::parse_str(&payload.pageId)?;
 
@@ -49,7 +49,7 @@ pub async fn update(
     app.batch(&batch, (
         (&payload.title, &payload.body, &payload.metadata, &bookId, &page_id, &uniqueId),
         (&payload.title, &payload.body, &payload.metadata, &bookId, &created_at),
-        (&payload.title, &payload.body, &payload.metadata, &auth_id, &bookId),
+        (&payload.title, &payload.body, &payload.metadata, auth.userId, &bookId),
         (&payload.title, &payload.body, &payload.metadata, &payload.category, &bookId),
     )).await?;
     Ok(HttpResponse::Ok().json(payload.clone()))

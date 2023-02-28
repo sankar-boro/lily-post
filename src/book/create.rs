@@ -34,7 +34,7 @@ pub struct CreateBookResponse {
     pageId: String,
     uniqueId: String,
     parentId: Option<String>,
-    authorId: String,
+    authorId: i32,
     title: String,
     body: String,
     url: Option<String>,
@@ -46,7 +46,6 @@ pub struct CreateBookResponse {
 
 pub async fn create(
     app: web::Data<App>,
-    // search: web::Data<Mutex<IndexHandler>>, 
     request: web::Json<ParentRequest>,
     session: Session
 ) 
@@ -75,18 +74,18 @@ pub async fn create(
     }
 
     let auth = session.user_info()?;
-    let auth_id = Uuid::parse_str(&auth.userId)?;
+    // let auth_id = Uuid::parse_str(&auth.userId)?;
     let unique_id = time_uuid();
     let unique__id = unique_id.to_string();
     let batch_values = (
         // CREATE_BOOKS
-        (&unique_id, &auth_id, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id),
+        (&unique_id, &auth.userId, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id),
         // CREATE_BOOK
-        (&unique_id, &unique_id, &unique_id, &auth_id, &request.title, &body, &image_url, &identity, &request.metadata, &unique_id, &unique_id),
+        (&unique_id, &unique_id, &unique_id, &auth.userId, &request.title, &body, &image_url, &identity, &request.metadata, &unique_id, &unique_id),
         // CREATE_USER_BOOKS
-        (&unique_id, &auth_id, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id),
+        (&unique_id, &auth.userId, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id),
         // CREATE_CATEGORY_BOOKS
-        (&request.category, &unique_id, &auth_id, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id),
+        (&request.category, &unique_id, &auth.userId, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id),
         // CREATE_BOOK_TITLE
         (&unique_id, &unique_id, &unique_id, &request.title, &identity)
     );
@@ -107,7 +106,7 @@ pub async fn create(
             body: body.clone(),
             url: image_url.clone(),
             identity,
-            authorId: auth_id.to_string(),
+            authorId: auth.userId,
             metadata: request.metadata.clone(),
             createdAt: unique__id.clone(),
             updatedAt: unique__id.clone(),

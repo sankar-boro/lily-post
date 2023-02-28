@@ -26,7 +26,7 @@ pub async fn update_image(
 -> Result<HttpResponse, crate::AppError> 
 {   
     let auth = session.user_info()?;
-    let auth_id = Uuid::parse_str(&auth.userId)?;
+    // let auth_id = Uuid::parse_str(&auth.userId)?;
     let bookId = Uuid::parse_str(&payload.bookId)?;
     let uniqueId = Uuid::parse_str(&payload.uniqueId)?;
     let pageId = Uuid::parse_str(&payload.pageId)?;
@@ -45,7 +45,7 @@ pub async fn update_image(
     app.batch(&batch, (
         (&payload.image_url, &bookId, &pageId, &uniqueId), // book
         (&payload.image_url, &bookId, &created_at), // books
-        (&payload.image_url, &auth_id, &bookId), // userbooks
+        (&payload.image_url, auth.userId, &bookId), // userbooks
         (&payload.image_url, &payload.category, &bookId), // categorybooks
     )).await?;
 

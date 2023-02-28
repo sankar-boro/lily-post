@@ -43,12 +43,14 @@ use std::env;
 #[derive(Clone)]
 pub struct App {
     session: Arc<Session>,
+    pool: Pool,
 }
 
 impl App {
-    fn new(session: Session) -> Self {
+    fn new(session: Session, pool: Pool) -> Self {
         Self {
             session: Arc::new(session),
+            pool
         }
     }
 
@@ -106,16 +108,17 @@ async fn main() {
     cfg.user = Some("sankar".to_string());
     cfg.password = Some("sankar".to_string());
     cfg.manager = Some(ManagerConfig { recycling_method: RecyclingMethod::Fast });
-    let pool = cfg.create_pool(Some(Runtime::Tokio1), NoTls).unwrap();
-    let mut client = pool.get().await.unwrap();
-        let stmt = client.prepare_cached("SELECT fname from users where user_id=1").await.unwrap();
-        let rows = client.query(&stmt, &[]).await.unwrap();
-        let value: String = rows[0].get(0);
-
-        println!("{}", value);
+    let pool: Pool = cfg.create_pool(Some(Runtime::Tokio1), NoTls).unwrap();
     let session = SessionBuilder::new().known_node(uri).build().await.unwrap();
-    
-
-    let app = App::new(session);
+    let app = App::new(session, pool);
     start_server(app).await.unwrap();
 }
+
+// let mut client = pool.get().await.unwrap();
+//         let stmt = client.prepare_cached("SELECT * from users").await.unwrap();
+//         let rows = client.query(&stmt, &[]).await.unwrap();
+//         let user_id: i32 = rows[0].get(0);
+//         let fname: String = rows[0].get(1);
+//         let lname: String = rows[0].get(2);
+
+//         println!("UserId: {}\nFirst Name: {}\nLast Name: {}", user_id, fname, lname);

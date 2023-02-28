@@ -6,9 +6,10 @@ DROP TABLE IF EXISTS userbooks;
 DROP TABLE IF EXISTS book_title;
 DROP TABLE IF EXISTS categorybooks;
 
+-- table books is used for rendering books when user is not logged in.
 CREATE TABLE books (
     bookId timeuuid,
-    authorId timeuuid,
+    authorId int,
     title varchar,
     body text,
     url text,
@@ -17,13 +18,12 @@ CREATE TABLE books (
     updatedAt timeuuid,
     PRIMARY KEY (bookId, createdAt)
 ) WITH CLUSTERING ORDER BY (createdAt DESC);
--- table books is used for rendering books when user is not logged in.
 CREATE TABLE book (
     bookId timeuuid,
     pageId timeuuid,
     uniqueId timeuuid,
     parentId timeuuid,
-    authorId timeuuid,
+    authorId int,
     title varchar,
     body text,
     url text,
@@ -35,7 +35,7 @@ CREATE TABLE book (
 );
 CREATE TABLE userbooks (
     bookId timeuuid,
-    authorId timeuuid,
+    authorId int,
     title varchar,
     body text,
     url text,
@@ -47,7 +47,7 @@ CREATE TABLE userbooks (
 CREATE TABLE categorybooks (
     category text,
     bookId timeuuid,
-    authorId timeuuid,
+    authorId int,
     title varchar,
     body text,
     url text,
@@ -73,31 +73,3 @@ TRUNCATE TABLE sankar.book;
 TRUNCATE TABLE sankar.userbooks;
 TRUNCATE TABLE sankar.categorybooks;
 TRUNCATE TABLE sankar.book_title;
-
-
-CREATE TABLE updatebooknode (
-    bookId timeuuid,
-    uniqueId timeuuid,
-    parentId timeuuid,
-    authorId timeuuid,
-    body text,
-    identity smallint,
-    createdAt timeuuid,
-    updatedAt timeuuid,
-    PRIMARY KEY ((bookId, parentId), uniqueId)
-) WITH CLUSTERING ORDER BY (uniqueId DESC);
-
-CREATE TABLE book (
-    bookId timeuuid,
-    uniqueId timeuuid,
-    parentId timeuuid,
-    authorId timeuuid,
-    title varchar,
-    body text,
-    url text,
-    identity smallint,
-    metadata text,
-    createdAt timeuuid,
-    updatedAt timeuuid,
-    PRIMARY KEY (bookId, uniqueId)
-);

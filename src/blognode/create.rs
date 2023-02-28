@@ -34,7 +34,7 @@ pub async fn create(
 -> Result<HttpResponse, crate::AppError> 
 {   
     let auth = session.user_info()?;
-    let author_id = Uuid::parse_str(&auth.userId)?;
+    // let author_id = Uuid::parse_str(&auth.userId)?;
 
     let identity: i16 = 104;
     let new_id = time_uuid();
@@ -49,7 +49,7 @@ pub async fn create(
         &blog_id,
         &new_id,
         &top_unique_id,
-        &author_id,
+        auth.userId,
         &payload.title,
         &payload.body,
         &payload.metadata,

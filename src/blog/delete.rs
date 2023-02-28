@@ -26,7 +26,7 @@ pub async fn delete(
     let blog_id = Uuid::parse_str(&payload.blogId)?;
     let category = &payload.category;
     let auth = session.user_info()?;
-    let auth_id = &auth.userId.to_uuid()?;
+    // let auth_id = &auth.userId.to_uuid()?;
 
     let mut batch: Batch = Default::default();
     batch.append_statement(DELETE_BLOGS);
@@ -34,7 +34,7 @@ pub async fn delete(
     batch.append_statement(DELETE_USERBLOGS);
     batch.append_statement(DELETE_CATEGORYBLOGS);
     
-    let batch_values = ((&blog_id,), (&blog_id,), (&auth_id, &blog_id,), (&category, &blog_id,), );
+    let batch_values = ((&blog_id,), (&blog_id,), (auth.userId, &blog_id,), (&category, &blog_id,), );
     app.batch(&batch, &batch_values).await?;
     Ok(HttpResponse::Ok().body("Deleted blog."))
 }

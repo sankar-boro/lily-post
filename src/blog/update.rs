@@ -28,7 +28,7 @@ pub async fn update(
     let blogId = Uuid::parse_str(&payload.blogId)?;
     let uniqueId = Uuid::parse_str(&payload.uniqueId)?;
     let auth = session.user_info()?;
-    let auth_id = Uuid::parse_str(&auth.userId)?;
+    // let auth_id = Uuid::parse_str(&auth.userId)?;
 
     let mut batch: Batch = Default::default();
     let blogQuery = Query::from(format!("UPDATE sankar.blog SET title=?, body=?, metadata=? WHERE blogId=? AND uniqueId=?"));
@@ -43,7 +43,7 @@ pub async fn update(
     app.batch(&batch, (
         (&payload.title, &payload.body, &payload.metadata, &blogId, &uniqueId),
         (&payload.title, &payload.body, &payload.metadata, &blogId),
-        (&payload.title, &payload.body, &payload.metadata, &auth_id, &blogId),
+        (&payload.title, &payload.body, &payload.metadata, auth.userId, &blogId),
         (&payload.title, &payload.body, &payload.metadata, &payload.category, &blogId),
     )).await?;
 

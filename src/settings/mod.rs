@@ -27,11 +27,11 @@ pub async fn create(
 -> Result<HttpResponse, crate::AppError> 
 {
     let auth = session.user_info()?;
-    let author_id = Uuid::parse_str(&auth.userId)?;
+    // let author_id = Uuid::parse_str(&auth.userId)?;
     let book_id = &request.bookId.to_uuid()?;
 
     let create_data = ( 
-        &author_id,
+        auth.userId,
         &book_id,
         &request.settings,
     );
@@ -47,12 +47,12 @@ pub async fn update(
 -> Result<HttpResponse, crate::AppError> 
 {
     let auth = session.user_info()?;
-    let author_id = Uuid::parse_str(&auth.userId)?;
+    // let author_id = Uuid::parse_str(&auth.userId)?;
     let book_id = &request.bookId.to_uuid()?;
 
     let create_data = ( 
         &request.settings,
-        &author_id,
+        auth.userId,
         &book_id,
     );
     app.query(UPDATE_USER_BOOK_SETTINGS, create_data).await?;

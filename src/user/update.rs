@@ -25,10 +25,10 @@ pub async fn update(app: web::Data<App>, request: web::Json<Request>, session: S
 -> Result<HttpResponse, crate::AppError> {
     
     let auth = session.user_info()?;
-    let auth_id = Uuid::parse_str(&auth.userId)?;
+    // let auth_id = Uuid::parse_str(&auth.userId)?;
     let _: Option<Vec<User>> = app
     .query(UPDATE_USER, (
-        &request.fname, &request.lname, &auth_id
+        &request.fname, &request.lname, auth.userId
     ))
     .await.get_query_result()?;
     Ok(HttpResponse::Ok().body("User updated"))

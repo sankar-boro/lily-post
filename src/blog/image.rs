@@ -27,7 +27,7 @@ pub async fn update_image(
     let blogId = Uuid::parse_str(&payload.blogId)?;
     let uniqueId = Uuid::parse_str(&payload.uniqueId)?;
     let auth = session.user_info()?;
-    let auth_id = Uuid::parse_str(&auth.userId)?;
+    // let auth_id = Uuid::parse_str(&auth.userId)?;
     let created_at = Uuid::parse_str(&payload.createdAt)?;
 
     let mut batch: Batch = Default::default();
@@ -41,7 +41,7 @@ pub async fn update_image(
     app.batch(&batch, (
             (&payload.url, &blogId, &uniqueId),
             (&payload.url, &blogId, &created_at),
-            (&payload.url, &auth_id, &blogId),
+            (&payload.url, auth.userId, &blogId),
             (&payload.url, &payload.category, &blogId),
         )
     ).await?;
