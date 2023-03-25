@@ -2,7 +2,6 @@ use actix_session::Session;
 use actix_web::{HttpResponse, web};
 use lily_utils::time_uuid;
 use serde::{Deserialize};
-use uuid::Uuid;
 use crate::{
     App, 
     query::{
@@ -46,6 +45,7 @@ pub async fn delete_category(
 {
 
     let auth = session.user_info()?;
+    println!("auth: {:?}", auth);
     // let auth_id = Uuid::parse_str(&auth.userId)?;
     let _ = app
     .query(DELETE_CATEGORY, (auth.userId, &request.category))

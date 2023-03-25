@@ -2,7 +2,7 @@ use serde::{Serialize, Deserialize };
 use actix_session::Session;
 use crate::AppError;
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct AUTHUSER {
     pub userId: i32,
     pub fname: String,
