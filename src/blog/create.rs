@@ -11,7 +11,6 @@ use scylla::{
     macros::FromRow
 };
 use crate::auth::AuthSession;
-use crate::utils::ParseUuid;
 
 #[derive(Deserialize, FromRow)]
 pub struct ParentRequest {

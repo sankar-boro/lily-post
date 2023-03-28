@@ -9,7 +9,6 @@ use serde::{Serialize, Deserialize};
 use validator::Validate;
 use scylla::macros::FromRow;
 use actix_session::Session;
-use uuid::Uuid;
 
 #[derive(Deserialize, Validate, FromRow)]
 pub struct AppendNodeRequest {

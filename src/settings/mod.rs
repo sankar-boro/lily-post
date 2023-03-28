@@ -1,7 +1,6 @@
 use actix_session::Session;
 use actix_web::{HttpResponse, web};
 use serde::{Deserialize};
-use uuid::Uuid;
 use crate::{
     App, 
     query::{CREATE_USER_BOOK_SETTINGS, UPDATE_USER_BOOK_SETTINGS}

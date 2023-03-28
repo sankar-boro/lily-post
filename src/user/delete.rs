@@ -1,5 +1,4 @@
 use actix_web::{web, HttpResponse};
-use uuid::Uuid;
 use crate::App;
 
 #[allow(dead_code)]

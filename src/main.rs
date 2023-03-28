@@ -36,11 +36,12 @@ use scylla::query::Query;
 use scylla::frame::value::ValueList;
 use scylla::frame::value::BatchValues;
 use scylla::transport::errors::QueryError;
-use deadpool_postgres::{Config, Manager, ManagerConfig, Pool, RecyclingMethod, Runtime};
+use deadpool_postgres::{Config, ManagerConfig, Pool, RecyclingMethod, Runtime};
 use tokio_postgres::NoTls;
 use std::env;
 
 #[derive(Clone)]
+#[allow(dead_code)]
 pub struct App {
     session: Arc<Session>,
     pool: Pool,

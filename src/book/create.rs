@@ -11,7 +11,6 @@ use scylla::{
     batch::Batch,
     macros::FromRow
 };
-use uuid::Uuid;
 use validator::Validate;
 use actix_session::Session;
 use lily_utils::time_uuid;

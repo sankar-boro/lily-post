@@ -1,7 +1,6 @@
 use actix_web::{HttpResponse, web};
 use lily_utils::time_uuid;
 use serde::{Serialize, Deserialize};
-use uuid::Uuid;
 use crate::{App, auth::AuthSession};
 use crate::utils::ParseUuid;
 use scylla::macros::FromRow;
