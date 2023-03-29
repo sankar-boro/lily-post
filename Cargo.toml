@@ -55,6 +55,9 @@ lazy_static = "1.4.0"
 env_logger = "0.8"
 log = "0.4"
 
+# search
+meilisearch-sdk = "0.22.0"
+
 lily-utils = { path = "./lily-utils"}
 tantivy = "0.18.0"
 tempfile = "3.3.0"

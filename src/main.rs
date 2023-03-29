@@ -15,6 +15,7 @@ mod auth;
 mod booknode;
 mod blognode;
 mod settings;
+mod batch;
 
 use std::sync::Arc;
 use anyhow::Result;
@@ -39,19 +40,24 @@ use scylla::transport::errors::QueryError;
 use deadpool_postgres::{Config, ManagerConfig, Pool, RecyclingMethod, Runtime};
 use tokio_postgres::NoTls;
 use std::env;
+use meilisearch_sdk::{
+    client::Client
+};
 
 #[derive(Clone)]
 #[allow(dead_code)]
 pub struct App {
     session: Arc<Session>,
     pool: Pool,
+    indexer: Client,
 }
 
 impl App {
-    fn new(session: Session, pool: Pool) -> Self {
+    fn new(session: Session, pool: Pool, indexer: Client) -> Self {
         Self {
             session: Arc::new(session),
-            pool
+            pool,
+            indexer
         }
     }
 
@@ -111,7 +117,8 @@ async fn main() {
     cfg.manager = Some(ManagerConfig { recycling_method: RecyclingMethod::Fast });
     let pool: Pool = cfg.create_pool(Some(Runtime::Tokio1), NoTls).unwrap();
     let session = SessionBuilder::new().known_node(uri).build().await.unwrap();
-    let app = App::new(session, pool);
+    let indexer = Client::new("http://localhost:7700", "authUser");
+    let app = App::new(session, pool, indexer);
     start_server(app).await.unwrap();
 }
 

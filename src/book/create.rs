@@ -16,6 +16,7 @@ use actix_session::Session;
 use lily_utils::time_uuid;
 use actix_web::{HttpResponse, web};
 use serde::{Deserialize, Serialize};
+use crate::create_batch;
 // use jsonwebtoken::{encode, Algorithm, Header, EncodingKey};
 
 #[derive(Deserialize, Validate, FromRow)]
@@ -50,12 +51,7 @@ pub async fn create(
 ) 
 -> Result<HttpResponse, crate::AppError> 
 {
-    let mut batch: Batch = Default::default();
-    batch.append_statement(CREATE_BOOKS);
-    batch.append_statement(CREATE_BOOK);
-    batch.append_statement(CREATE_USER_BOOKS);
-    batch.append_statement(CREATE_CATEGORY_BOOKS);
-    batch.append_statement(CREATE_BOOK_TITLE);
+    let batch: Batch = create_batch![CREATE_BOOKS, CREATE_BOOK, CREATE_USER_BOOKS, CREATE_CATEGORY_BOOKS, CREATE_BOOK_TITLE];
     let identity: i16 = 101;
 
     let mut body = String::from("");
