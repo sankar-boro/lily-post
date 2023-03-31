@@ -43,6 +43,7 @@ use std::env;
 use meilisearch_sdk::{
     client::Client
 };
+use scylla::prepared_statement::PreparedStatement;
 
 #[derive(Clone)]
 #[allow(dead_code)]
@@ -70,8 +71,12 @@ impl App {
         self.session.query_paged(query, values, pagedata).await
     }
 
-    pub async fn batch(&self, query: &Batch, values: impl BatchValues) -> Result<BatchResult, QueryError>{
+    pub async fn batch(&self, query: &Batch, values: impl BatchValues) -> Result<BatchResult, QueryError> {
         self.session.batch(query, values).await
+    }
+
+    pub async fn execute(&self, query: &PreparedStatement, values: impl ValueList) -> Result<QueryResult, QueryError> {
+        self.session.execute(&query, values).await
     }
 }
 

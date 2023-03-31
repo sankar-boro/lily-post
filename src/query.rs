@@ -88,9 +88,9 @@ pub static CREATE_CATEGORY_BLOGS: &str = "INSERT INTO sankar.categoryblogs (
 )";
 
 pub static CREATE_ALLCATEGORY: &str = "INSERT INTO sankar.allcategories (
-    category, division
+    category, authorId, createdAt, updatedAt
 ) VALUES(
-    ?, ?
+    ?, ?, ?, ?
 ) IF NOT EXISTS";
 
 pub static CREATE_USER_BOOK_SETTINGS: &str = "INSERT INTO sankar.userbooksettings (

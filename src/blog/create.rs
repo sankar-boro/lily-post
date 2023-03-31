@@ -4,7 +4,7 @@ use lily_utils::time_uuid;
 use serde::{Deserialize, Serialize};
 use crate::{
     App,
-    query::{ CREATE_BLOGS, CREATE_BLOG, CREATE_USER_BLOGS, CREATE_CATEGORY_BLOGS, CREATE_ALLCATEGORY }
+    query::{ CREATE_BLOGS, CREATE_BLOG, CREATE_USER_BLOGS, CREATE_CATEGORY_BLOGS }
 };
 use scylla::{
     batch::Batch,
@@ -71,7 +71,6 @@ pub async fn create(
         (&request.category, &unique_id, auth.userId, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id)
     );
     app.batch(&batch, &batch_values).await?;
-    app.query(CREATE_ALLCATEGORY, (&request.category, "demo")).await?;
     Ok(
         HttpResponse::Ok().json(ParentResponse {
             blogId: unique___id.clone(),
