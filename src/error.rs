@@ -7,7 +7,9 @@ use actix_web::{
     HttpResponse,
 };
 use derive_more::Display;
-
+use deadpool_postgres::PoolError;
+use tokio_pg_mapper::Error as PGMError;
+use tokio_postgres::error::Error as PGError;
 
 #[derive(Display, Debug)]
 #[display(fmt = "status: {}", status)]
@@ -145,6 +147,33 @@ impl From<serde_json::Error> for Error {
 
 impl From<scylla::cql_to_rust::FromRowError> for Error {
     fn from(e: scylla::cql_to_rust::FromRowError) -> Self {
+        Error {
+            status: StatusCode::INTERNAL_SERVER_ERROR,
+            message: e.to_string(),
+        }
+    }
+}
+
+impl From<PoolError> for Error {
+    fn from(e: PoolError) -> Self {
+        Error {
+            status: StatusCode::INTERNAL_SERVER_ERROR,
+            message: e.to_string(),
+        }
+    }
+}
+
+impl From<PGMError> for Error {
+    fn from(e: PGMError) -> Self {
+        Error {
+            status: StatusCode::INTERNAL_SERVER_ERROR,
+            message: e.to_string(),
+        }
+    }
+}
+
+impl From<PGError> for Error {
+    fn from(e: PGError) -> Self {
         Error {
             status: StatusCode::INTERNAL_SERVER_ERROR,
             message: e.to_string(),
