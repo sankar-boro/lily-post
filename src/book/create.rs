@@ -1,9 +1,8 @@
 use crate::auth::AuthSession;
-use crate::query::ADD_CATEGORY;
 use crate::{
     App, 
     query::{
-        CREATE_BOOKS, CREATE_BOOK, CREATE_BOOK_TITLE, 
+        CREATE_BOOKS, CREATE_BOOK, CREATE_BOOK_TITLE, ADD_USER_CATEGORY,
         CREATE_USER_BOOKS, CREATE_CATEGORY_BOOKS, CREATE_ALLCATEGORY
     }
 };
@@ -98,15 +97,18 @@ pub async fn create(
         app.execute(&prepared, (&i.category, &unique_id, &auth.userId, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id)).await?;
     }
 
+    let uunique_id = time_uuid();
+
     for i in &request.category {
+        app.query(
+            ADD_USER_CATEGORY, 
+            (auth.userId, &i.category, &uunique_id, &uunique_id)
+        ).await?;
         if !i.exists {
-            let uunique_id = time_uuid();
-            let _ = app
-            .query(ADD_CATEGORY, (auth.userId, &i.category, &uunique_id, &uunique_id))
-            .await?;
-            let _ = app
-            .query(CREATE_ALLCATEGORY, (&i.category, auth.userId, &uunique_id, &uunique_id))
-            .await?;
+            app.query(
+                CREATE_ALLCATEGORY, 
+                (&i.category, auth.userId, &uunique_id, &uunique_id)
+            ).await?;
             let index = app.indexer.index("categories");
             let doc : Vec<AddCategory> = vec![AddCategory {
                 id: uunique_id.clone(),

@@ -59,11 +59,11 @@ pub static CREATE_CATEGORY_BOOKS: &str = "INSERT INTO sankar.categorybooks (
 ) VALUES(
     ?, ?, ?, ?, ?, ?, ?, ?, ?
 )";
-pub static ADD_CATEGORY: &str = "INSERT INTO sankar.usercategories (
+pub static ADD_USER_CATEGORY: &str = "INSERT INTO sankar.usercategories (
     authorId, category, createdAt, updatedAt
 ) VALUES(
     ?, ?, ?, ?
-)";
+) IF NOT EXISTS";
 pub static DELETE_CATEGORY: &str = "DELETE FROM sankar.usercategories WHERE authorId=? AND category=?";
 pub static CREATE_BLOGS: &str = "INSERT INTO sankar.blogs (
     blogId, authorId, title, body, url, metadata, createdAt, updatedAt

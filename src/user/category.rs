@@ -5,7 +5,7 @@ use serde::{Deserialize};
 use crate::{
     App, 
     query::{
-        ADD_CATEGORY,DELETE_CATEGORY
+        ADD_USER_CATEGORY, DELETE_CATEGORY
     }
 };
 use validator::Validate;
@@ -29,7 +29,7 @@ pub async fn add_category(
     let auth = session.user_info()?;
     let unique_id = time_uuid();
     let _ = app
-    .query(ADD_CATEGORY, (auth.userId, &request.category, &unique_id, &unique_id))
+    .query(ADD_USER_CATEGORY, (auth.userId, &request.category, &unique_id, &unique_id))
     .await?;
     Ok(
         HttpResponse::Ok().body("Ok")

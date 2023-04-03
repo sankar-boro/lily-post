@@ -9,7 +9,7 @@ use actix_web::{web};
 use crate::middleware::Authentication;
 
 pub fn routes(config: &mut web::ServiceConfig) {
-  config.route("/signup", web::get().to(user::signup));
+  config.route("/signup", web::post().to(user::signup));
 
   // user
   config.service(
