@@ -5,7 +5,8 @@ use actix_service::{Service, Transform};
 use actix_web::{dev::ServiceRequest, dev::ServiceResponse, Error, error::ErrorUnauthorized};
 use futures::future::{ok, Ready};
 use futures::Future;
-use actix_session::UserSession;
+use actix_session::SessionExt;
+// use actix_session::UserSession;
 
 
 #[derive(Debug, Clone)]

@@ -10,6 +10,7 @@ use derive_more::Display;
 use deadpool_postgres::PoolError;
 use tokio_pg_mapper::Error as PGMError;
 use tokio_postgres::error::Error as PGError;
+use actix_session::{SessionInsertError, SessionGetError};
 
 #[derive(Display, Debug)]
 #[display(fmt = "status: {}", status)]
@@ -180,6 +181,25 @@ impl From<PGError> for Error {
         }
     }
 }
+
+impl From<SessionInsertError> for Error {
+    fn from(e: SessionInsertError) -> Self {
+        Error {
+            status: StatusCode::INTERNAL_SERVER_ERROR,
+            message: e.to_string(),
+        }
+    }
+}
+
+impl From<SessionGetError> for Error {
+    fn from(e: SessionGetError) -> Self {
+        Error {
+            status: StatusCode::INTERNAL_SERVER_ERROR,
+            message: e.to_string(),
+        }
+    }
+}
+
 
 #[derive(Serialize)]
 pub struct ErrorResponse {

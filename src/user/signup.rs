@@ -38,6 +38,12 @@ pub async fn signup(
     app: web::Data<App>, 
     request: web::Json<SignupForm>
 ) -> Result<HttpResponse, crate::AppError> {
+    let client = app.pool.get().await?;
+    let healthy = app.indexer.is_healthy().await;
+    if !healthy {
+        return Err(AppError::from("indexer not healthy").into()); 
+    }
+
     if let Err(err) = request.validate() {
 		return Err(AppError::from(err).into());
 	}
@@ -50,7 +56,6 @@ pub async fn signup(
     let fname = &request.fname.trim();
     let lname = &request.lname.trim();
     let email = &request.email.trim();
-    let client = app.pool.get().await?;
     let stmt = client.prepare_cached(INSERT_USER).await?;
     // let rows = client.query(&stmt, &[fname, lname, email, &password]).await?;
     let rows = client.query_opt(&stmt, &[fname, lname, email, &password]).await?;

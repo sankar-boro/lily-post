@@ -17,19 +17,17 @@ mod blognode;
 mod settings;
 mod batch;
 
+use time::Duration;
 use std::sync::Arc;
 use anyhow::Result;
 use error::Error as AppError;
-use actix_redis::RedisSession;
+// use actix_redis::RedisSession;
 use scylla::batch::Batch;
 use scylla::{
     Session, 
     SessionBuilder
 };
-use actix_web::{App as ActixApp, HttpServer};
-use actix_web::web::{
-    self,
-};
+use actix_web::{web, cookie, App as ActixApp, HttpServer};
 use actix_cors::Cors;
 
 use scylla::{QueryResult, BatchResult};
@@ -44,6 +42,7 @@ use meilisearch_sdk::{
     client::Client
 };
 use scylla::prepared_statement::PreparedStatement;
+use actix_session::{storage::RedisActorSessionStore, SessionMiddleware, config::PersistentSession};
 
 #[derive(Clone)]
 #[allow(dead_code)]
@@ -83,6 +82,7 @@ impl App {
 async fn start_server(app: App) -> Result<()> {
     let host = env::var("HOST").unwrap();
     let port = env::var("PORT").unwrap();
+    let private_key = cookie::Key::from("authUser".as_bytes());
 
     HttpServer::new(move || {
         let cors = Cors::default()
@@ -94,10 +94,19 @@ async fn start_server(app: App) -> Result<()> {
         ActixApp::new()
             .wrap(cors)
             .wrap(
-                RedisSession::new("127.0.0.1:6379", &[0; 32])
-                .cookie_name("lily-session")
-                .cookie_http_only(true)
-                .ttl(86400)
+                // RedisSession::new("127.0.0.1:6379", &[0; 32])
+                // .cookie_name("lily-session")
+                // .cookie_http_only(true)
+                // .ttl(86400)
+                SessionMiddleware::builder(
+                    RedisActorSessionStore::new("127.0.0.1:6379"),
+                    private_key.clone(),
+                )
+                .session_lifecycle(
+                    PersistentSession::default()
+                        .session_ttl(Duration::days(5))
+                )
+                .build()
             )
             .app_data(web::Data::new(app.clone()))
             .configure(route::routes)
@@ -122,16 +131,7 @@ async fn main() {
     cfg.manager = Some(ManagerConfig { recycling_method: RecyclingMethod::Fast });
     let pool: Pool = cfg.create_pool(Some(Runtime::Tokio1), NoTls).unwrap();
     let session = SessionBuilder::new().known_node(uri).build().await.unwrap();
-    let indexer = Client::new("http://localhost:7700", "authUser");
+    let indexer = Client::new("http://localhost:7700", Some("authUser"));
     let app = App::new(session, pool, indexer);
     start_server(app).await.unwrap();
 }
-
-// let mut client = pool.get().await.unwrap();
-//         let stmt = client.prepare_cached("SELECT * from users").await.unwrap();
-//         let rows = client.query(&stmt, &[]).await.unwrap();
-//         let user_id: i32 = rows[0].get(0);
-//         let fname: String = rows[0].get(1);
-//         let lname: String = rows[0].get(2);
-
-//         println!("UserId: {}\nFirst Name: {}\nLast Name: {}", user_id, fname, lname);
