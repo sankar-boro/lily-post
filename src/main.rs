@@ -16,32 +16,25 @@ mod booknode;
 mod blognode;
 mod settings;
 mod batch;
+mod db;
 
+use std::env;
 use time::Duration;
 use std::sync::Arc;
 use anyhow::Result;
-use error::Error as AppError;
-// use actix_redis::RedisSession;
-use scylla::batch::Batch;
-use scylla::{
-    Session, 
-    SessionBuilder
-};
-use actix_web::{web, cookie, App as ActixApp, HttpServer};
+use scylla::Session;
 use actix_cors::Cors;
-
-use scylla::{QueryResult, BatchResult};
+use scylla::batch::Batch;
 use scylla::query::Query;
+use deadpool_postgres::Pool;
+use error::Error as AppError;
 use scylla::frame::value::ValueList;
+use meilisearch_sdk::{client::Client};
 use scylla::frame::value::BatchValues;
+use scylla::{QueryResult, BatchResult};
 use scylla::transport::errors::QueryError;
-use deadpool_postgres::{Config, ManagerConfig, Pool, RecyclingMethod, Runtime};
-use tokio_postgres::NoTls;
-use std::env;
-use meilisearch_sdk::{
-    client::Client
-};
 use scylla::prepared_statement::PreparedStatement;
+use actix_web::{web, cookie, App as ActixApp, HttpServer};
 use actix_session::{storage::RedisActorSessionStore, SessionMiddleware, config::PersistentSession};
 
 #[derive(Clone)]
@@ -80,9 +73,13 @@ impl App {
 }
 
 async fn start_server(app: App) -> Result<()> {
-    let host = env::var("HOST").unwrap();
-    let port = env::var("PORT").unwrap();
-    let private_key = cookie::Key::from("authUser".as_bytes());
+    let lp_host = env::var("LP_HOST").unwrap();
+    let lp_port = env::var("LP_PORT").unwrap();
+    let lp_port: u16 = lp_port.parse().unwrap();
+    let pkey = env::var("PRIVATE_KEY").unwrap();
+    let redis_uri = env::var("REDIS_URI").unwrap();
+
+    let private_key = cookie::Key::from(pkey.as_bytes());
 
     HttpServer::new(move || {
         let cors = Cors::default()
@@ -94,12 +91,8 @@ async fn start_server(app: App) -> Result<()> {
         ActixApp::new()
             .wrap(cors)
             .wrap(
-                // RedisSession::new("127.0.0.1:6379", &[0; 32])
-                // .cookie_name("lily-session")
-                // .cookie_http_only(true)
-                // .ttl(86400)
                 SessionMiddleware::builder(
-                    RedisActorSessionStore::new("127.0.0.1:6379"),
+                    RedisActorSessionStore::new(&redis_uri),
                     private_key.clone(),
                 )
                 .session_lifecycle(
@@ -111,7 +104,7 @@ async fn start_server(app: App) -> Result<()> {
             .app_data(web::Data::new(app.clone()))
             .configure(route::routes)
     })
-    .bind(format!("{}:{}", host, port))?
+    .bind((lp_host, lp_port))?
     .run()
     .await?;
     Ok(())
@@ -123,15 +116,11 @@ async fn main() {
     std::env::set_var("RUST_LOG", "info");
     std::env::set_var("RUST_BACKTRACE", "1");
     env_logger::init();
-    let uri = "127.0.0.1:9042";
-    let mut cfg = Config::new();
-    cfg.dbname = Some("sankar".to_string());
-    cfg.user = Some("sankar".to_string());
-    cfg.password = Some("sankar".to_string());
-    cfg.manager = Some(ManagerConfig { recycling_method: RecyclingMethod::Fast });
-    let pool: Pool = cfg.create_pool(Some(Runtime::Tokio1), NoTls).unwrap();
-    let session = SessionBuilder::new().known_node(uri).build().await.unwrap();
-    let indexer = Client::new("http://localhost:7700", Some("authUser"));
+    
+    let session = db::get_scylla_connection().await;
+    let pool = db::get_pg_connection().await;
+    let indexer = db::get_indexer_connection().await;
+    
     let app = App::new(session, pool, indexer);
     start_server(app).await.unwrap();
 }
