@@ -6,7 +6,7 @@ PG_DB_UNAME=sankar \
 PG_DB_PWD=sankar \
 REDIS_URI="127.0.0.1:6379" \
 DB_URI="127.0.0.1:9042" \
-INDEXER_URI="127.0.0.1:7700" \
+INDEXER_URI="http://localhost:7700" \
 LP_HOST=localhost \
 LP_PORT=7501 \
 ./target/release/lily_post

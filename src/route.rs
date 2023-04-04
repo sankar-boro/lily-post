@@ -10,6 +10,7 @@ use crate::middleware::Authentication;
 
 pub fn routes(config: &mut web::ServiceConfig) {
   config.route("/signup", web::post().to(user::signup));
+  config.route("/signup_admin", web::post().to(user::signup_admin));
 
   // user
   config.service(
