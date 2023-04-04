@@ -1,6 +1,6 @@
 use serde::{Serialize, Deserialize };
 use actix_session::Session;
-use crate::AppError;
+use crate::{AppError};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct AUTHUSER {

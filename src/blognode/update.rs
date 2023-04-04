@@ -1,5 +1,5 @@
 use uuid::Uuid;
-use crate::App;
+use crate::Connections;
 use validator::Validate;
 use serde::{Deserialize};
 use scylla::macros::FromRow;
@@ -15,7 +15,7 @@ pub struct UpdateRequest {
 }
 
 pub async fn update(
-    app: web::Data<App>, 
+    app: web::Data<Connections>, 
     payload: web::Json<UpdateRequest>
 ) 
 -> Result<HttpResponse, crate::AppError> 

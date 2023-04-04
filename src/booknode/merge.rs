@@ -1,4 +1,4 @@
-use crate::{App};
+use crate::{Connections};
 use crate::{auth::AuthSession};
 use crate::utils::ParseUuid;
 use crate::query::CREATE_BOOK_TITLE;
@@ -45,7 +45,7 @@ pub static UPDATE_PARENT_TITLE: &str = "UPDATE sankar.book_title SET parentId=? 
 
 impl MergeNodeRequest {
 
-    async fn batch(&self, app: &App, batch_values: impl BatchValues) -> Result<BatchResult, crate::AppError> {
+    async fn batch(&self, app: &Connections, batch_values: impl BatchValues) -> Result<BatchResult, crate::AppError> {
         let mut batch: Batch = Default::default();
         batch.append_statement(UPDATE_PARENT_ID);
         batch.append_statement(CHILD);
@@ -55,7 +55,7 @@ impl MergeNodeRequest {
         Ok(app.batch(&batch, batch_values).await?)
     }
 
-    async fn run(&self, app: &App, session: &Session) -> Result<HttpResponse, crate::AppError> {
+    async fn run(&self, app: &Connections, session: &Session) -> Result<HttpResponse, crate::AppError> {
         let auth = session.user_info()?;
         // let author_id = Uuid::parse_str(&auth.userId)?;
 
@@ -128,7 +128,7 @@ impl MergeNodeRequest {
 }
 
 pub async fn merge(
-    app: web::Data<App>, 
+    app: web::Data<Connections>, 
     payload: web::Json<MergeNodeRequest>,
     session: Session
 

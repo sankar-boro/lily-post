@@ -1,6 +1,6 @@
 use actix_web::{HttpResponse, web};
 use serde::Deserialize;
-use crate::App;
+use crate::Connections;
 use scylla::macros::FromRow;
 use scylla::batch::Batch;
 use scylla::query::Query;
@@ -19,7 +19,7 @@ pub struct UpdateRequest {
 }
 
 pub async fn update(
-    app: web::Data<App>, 
+    app: web::Data<Connections>, 
     payload: web::Json<UpdateRequest>,
     session: Session
 ) 

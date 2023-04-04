@@ -1,5 +1,5 @@
 use uuid::Uuid;
-use crate::App;
+use crate::Connections;
 use serde::Deserialize;
 use actix_web::{web, HttpResponse};
 use scylla::batch::Batch;
@@ -21,7 +21,7 @@ pub struct UpdateOrDelete {
 }
 
 pub async fn deleteAndUpdate(
-    app: web::Data<App>, 
+    app: web::Data<Connections>, 
     payload: web::Json<UpdateOrDelete>
 ) -> Result<HttpResponse, crate::AppError> {
 

@@ -1,4 +1,4 @@
-use crate::App;
+use crate::Connections;
 use uuid::Uuid;
 use validator::Validate;
 use scylla::batch::Batch;
@@ -23,7 +23,7 @@ pub struct UpdateRequest {
 }
 
 pub async fn update(
-    app: web::Data<App>, 
+    app: web::Data<Connections>, 
     payload: web::Json<UpdateRequest>,
     session: Session
 ) 

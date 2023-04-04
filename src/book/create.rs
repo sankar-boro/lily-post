@@ -1,6 +1,6 @@
 use crate::auth::AuthSession;
 use crate::{
-    App, 
+    Connections, 
     query::{
         CREATE_BOOKS, CREATE_BOOK, CREATE_BOOK_TITLE, ADD_USER_CATEGORY,
         CREATE_USER_BOOKS, CREATE_CATEGORY_BOOKS, CREATE_ALLCATEGORY
@@ -44,7 +44,7 @@ struct AddCategory {
 }
 
 pub async fn create(
-    app: web::Data<App>,
+    app: web::Data<Connections>,
     request: web::Json<ParentRequest>,
     session: Session
 ) 

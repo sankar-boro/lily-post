@@ -6,7 +6,7 @@ use serde::{Serialize};
 use scylla::macros::FromRow;
 use super::queries::UPDATE_USER;
 
-use crate::{App, auth::AuthSession, utils::{GetQueryResult}};
+use crate::{Connections, auth::AuthSession, utils::{GetQueryResult}};
 
 #[derive(Deserialize)]
 pub struct Request {
@@ -21,7 +21,7 @@ pub struct User {
 	password: Vec<u8>,
 }
 
-pub async fn update(app: web::Data<App>, request: web::Json<Request>, session: Session) 
+pub async fn update(app: web::Data<Connections>, request: web::Json<Request>, session: Session) 
 -> Result<HttpResponse, crate::AppError> {
     
     let auth = session.user_info()?;

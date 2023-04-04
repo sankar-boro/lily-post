@@ -1,7 +1,7 @@
 use actix_web::{HttpResponse, web};
 use lily_utils::time_uuid;
 use serde::{Serialize, Deserialize};
-use crate::{App, auth::AuthSession};
+use crate::{Connections, auth::AuthSession};
 use crate::utils::ParseUuid;
 use scylla::macros::FromRow;
 use actix_session::Session;
@@ -24,7 +24,7 @@ lazy_static! {
     static ref QUERY: String = create_query!("sankar.updatebooknode", "bookId", "uniqueId", "parentId", "authorId", "body", "identity", "createdAt", "updatedAt");
 }
 pub async fn pull_request(
-    app: web::Data<App>, 
+    app: web::Data<Connections>, 
     payload: web::Json<AppendNodeRequest>,
     session: Session
 ) 

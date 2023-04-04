@@ -1,5 +1,5 @@
 use uuid::Uuid;
-use crate::App;
+use crate::Connections;
 use actix_web::{web, HttpResponse};
 use scylla::batch::Batch;
 use actix_session::Session;
@@ -20,7 +20,7 @@ pub struct DeleteBookRequest {
 }
 
 pub async fn delete(
-    app: web::Data<App>,
+    app: web::Data<Connections>,
     payload: web::Json<DeleteBookRequest>,
     session: Session
 ) -> Result<HttpResponse, crate::AppError> {

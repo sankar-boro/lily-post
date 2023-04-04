@@ -1,4 +1,4 @@
-use crate::App;
+use crate::Connections;
 use crate::utils::ParseUuid;
 use crate::{auth::AuthSession};
 use crate::query::{CREATE_BLOG_NODE_QUERY};
@@ -26,7 +26,7 @@ pub struct Response {
 }
 
 pub async fn create(
-    app: web::Data<App>, 
+    app: web::Data<Connections>, 
     payload: web::Json<AppendNodeRequest>,
     session: Session
 ) 

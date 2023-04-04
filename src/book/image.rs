@@ -1,6 +1,6 @@
 use actix_web::{HttpResponse, web};
 use serde::{Deserialize, Serialize};
-use crate::App;
+use crate::Connections;
 use scylla::batch::Batch;
 use scylla::query::Query;
 use uuid::Uuid;
@@ -19,7 +19,7 @@ pub struct UpdateBookImage {
 }
 
 pub async fn update_image(
-    app: web::Data<App>, 
+    app: web::Data<Connections>, 
     payload: web::Json<UpdateBookImage>,
     session: Session
 ) 

@@ -1,5 +1,5 @@
 use crate::utils::ParseUuid;
-use crate::{App, auth::AuthSession};
+use crate::{Connections, auth::AuthSession};
 use crate::query::{CREATE_BOOK_NODE_QUERY, CREATE_BOOK_TITLE};
 
 use uuid::Uuid;
@@ -31,7 +31,7 @@ pub struct Response {
 }
 
 pub async fn create(
-    app: web::Data<App>, 
+    app: web::Data<Connections>, 
     payload: web::Json<AppendNodeRequest>,
     session: Session
 ) 

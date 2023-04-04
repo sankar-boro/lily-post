@@ -1,5 +1,5 @@
 use uuid::Uuid;
-use crate::App;
+use crate::Connections;
 use serde::Deserialize;
 use actix_web::{web, HttpResponse};
 use scylla::query::Query;
@@ -14,7 +14,7 @@ pub struct DeleteBookNodeRequest {
 }
 
 pub async fn delete(
-    app: web::Data<App>, 
+    app: web::Data<Connections>, 
     payload: web::Json<DeleteBookNodeRequest>
 ) -> Result<HttpResponse, crate::AppError> {
     let book_id = Uuid::parse_str(&payload.bookId)?;

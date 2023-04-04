@@ -1,5 +1,5 @@
 use uuid::Uuid;
-use crate::App;
+use crate::Connections;
 use serde::Deserialize;
 use actix_web::{web, HttpResponse};
 
@@ -10,7 +10,7 @@ pub struct DeleteNodeRequest {
 }
 
 pub async fn delete(
-    app: web::Data<App>, 
+    app: web::Data<Connections>, 
     payload: web::Json<DeleteNodeRequest>
 ) -> Result<HttpResponse, crate::AppError> {
     let blog_id = Uuid::parse_str(&payload.blogId)?;

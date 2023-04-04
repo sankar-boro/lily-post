@@ -1,5 +1,4 @@
-use crate::App;
-use crate::AppError;
+use crate::{Connections, AppError};
 
 use regex::Regex;
 use serde::Serialize;
@@ -35,7 +34,7 @@ pub struct AddUserIndex {
 }
 
 pub async fn signup(
-    app: web::Data<App>, 
+    app: web::Data<Connections>, 
     request: web::Json<SignupForm>
 ) -> Result<HttpResponse, crate::AppError> {
     let client = app.pool.get().await?;

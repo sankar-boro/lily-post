@@ -3,7 +3,7 @@ use actix_web::{HttpResponse, web};
 use lily_utils::time_uuid;
 use serde::{Deserialize};
 use crate::{
-    App, 
+    Connections, 
     query::{
         ADD_USER_CATEGORY, DELETE_CATEGORY
     }
@@ -20,7 +20,7 @@ pub struct UserCategoryRequest {
 }
 
 pub async fn add_category(
-    app: web::Data<App>,
+    app: web::Data<Connections>,
     request: web::Json<UserCategoryRequest>,
     session: Session
 ) 
@@ -37,7 +37,7 @@ pub async fn add_category(
 }
 
 pub async fn delete_category(
-    app: web::Data<App>,
+    app: web::Data<Connections>,
     request: web::Json<UserCategoryRequest>,
     session: Session
 ) 

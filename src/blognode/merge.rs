@@ -1,4 +1,4 @@
-use crate::{App};
+use crate::{Connections};
 use crate::{auth::AuthSession};
 
 use scylla::{
@@ -36,7 +36,7 @@ pub static CHILD: &str = "INSERT INTO sankar.blog (
 )";
 
 pub async fn merge(
-    app: web::Data<App>, 
+    app: web::Data<Connections>, 
     payload: web::Json<MergeNodeRequest>,
     session: Session
 ) 

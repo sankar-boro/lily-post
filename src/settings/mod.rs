@@ -1,10 +1,8 @@
 use actix_session::Session;
 use actix_web::{HttpResponse, web};
 use serde::{Deserialize};
-use crate::{
-    App, 
-    query::{CREATE_USER_BOOK_SETTINGS, UPDATE_USER_BOOK_SETTINGS}
-};
+use crate::Connections;
+use crate::query::{CREATE_USER_BOOK_SETTINGS, UPDATE_USER_BOOK_SETTINGS};
 use validator::Validate;
 use scylla::{
     macros::FromRow
@@ -19,7 +17,7 @@ pub struct ParentRequest {
 }
 
 pub async fn create(
-    app: web::Data<App>,
+    app: web::Data<Connections>,
     request: web::Json<ParentRequest>,
     session: Session
 ) 
@@ -39,7 +37,7 @@ pub async fn create(
 }
 
 pub async fn update(
-    app: web::Data<App>,
+    app: web::Data<Connections>,
     request: web::Json<ParentRequest>,
     session: Session
 ) 

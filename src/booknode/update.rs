@@ -1,6 +1,6 @@
 use actix_web::{HttpResponse, web};
 use serde::{Deserialize};
-use crate::App;
+use crate::Connections;
 use validator::Validate;
 use scylla::macros::FromRow;
 use uuid::Uuid;
@@ -19,7 +19,7 @@ pub struct UpdateRequest {
 }
 
 pub async fn update(
-    app: web::Data<App>, 
+    app: web::Data<Connections>, 
     payload: web::Json<UpdateRequest>
 ) 
 -> Result<HttpResponse, crate::AppError> 

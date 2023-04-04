@@ -1,5 +1,5 @@
 use uuid::Uuid;
-use crate::App;
+use crate::Connections;
 use actix_web::{web, HttpResponse};
 use scylla::batch::Batch;
 use actix_session::Session;
@@ -18,7 +18,7 @@ pub static DELETE_USERBLOGS: &str = "DELETE FROM sankar.userblogs where authorId
 pub static DELETE_CATEGORYBLOGS: &str = "DELETE FROM sankar.categoryblogs where category=? AND blogId IN (?)";
 
 pub async fn delete(
-    app: web::Data<App>,
+    app: web::Data<Connections>,
     payload: web::Json<DeleteBlogRequest>,
     session: Session
 ) -> Result<HttpResponse, crate::AppError> {

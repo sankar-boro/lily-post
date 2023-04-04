@@ -1,6 +1,6 @@
 use actix_web::{HttpResponse, web};
 use serde::{Deserialize, Serialize};
-use crate::App;
+use crate::Connections;
 use uuid::Uuid;
 
 #[derive(Deserialize, Serialize, Clone)]
@@ -11,7 +11,7 @@ pub struct UpdateNodeRequest {
 }
 
 pub async fn update_image(
-    app: web::Data<App>, 
+    app: web::Data<Connections>, 
     payload: web::Json<UpdateNodeRequest>
 ) 
 -> Result<HttpResponse, crate::AppError> 

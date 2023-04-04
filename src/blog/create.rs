@@ -3,7 +3,7 @@ use actix_web::{HttpResponse, web};
 use lily_utils::time_uuid;
 use serde::{Deserialize, Serialize};
 use crate::{
-    App,
+    Connections,
     query::{ CREATE_BLOGS, CREATE_BLOG, CREATE_USER_BLOGS, CREATE_CATEGORY_BLOGS }
 };
 use scylla::{
@@ -37,7 +37,7 @@ pub struct ParentResponse {
 }
 
 pub async fn create(
-    app: web::Data<App>, 
+    app: web::Data<Connections>, 
     request: web::Json<ParentRequest>,
     session: Session
 ) 

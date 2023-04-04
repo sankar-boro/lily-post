@@ -17,62 +17,18 @@ mod blognode;
 mod settings;
 mod batch;
 mod db;
+mod builder;
 
 use std::env;
 use time::Duration;
-use std::sync::Arc;
 use anyhow::Result;
-use scylla::Session;
 use actix_cors::Cors;
-use scylla::batch::Batch;
-use scylla::query::Query;
-use deadpool_postgres::Pool;
+pub use builder::Connections;
 use error::Error as AppError;
-use scylla::frame::value::ValueList;
-use meilisearch_sdk::{client::Client};
-use scylla::frame::value::BatchValues;
-use scylla::{QueryResult, BatchResult};
-use scylla::transport::errors::QueryError;
-use scylla::prepared_statement::PreparedStatement;
 use actix_web::{web, cookie, App as ActixApp, HttpServer};
 use actix_session::{storage::RedisActorSessionStore, SessionMiddleware, config::PersistentSession};
 
-#[derive(Clone)]
-#[allow(dead_code)]
-pub struct App {
-    session: Arc<Session>,
-    pool: Pool,
-    indexer: Client,
-}
-
-impl App {
-    fn new(session: Session, pool: Pool, indexer: Client) -> Self {
-        Self {
-            session: Arc::new(session),
-            pool,
-            indexer
-        }
-    }
-
-    pub async fn query(&self, query: impl Into<Query>, values: impl ValueList) -> Result<QueryResult, QueryError>{
-        self.session.query(query, values).await
-    }
-
-    pub async fn query_paged(&self, query: impl Into<Query>, values: impl ValueList, page: Vec<u8>) -> Result<QueryResult, QueryError>{
-        let pagedata = Some(scylla::Bytes::from(page));
-        self.session.query_paged(query, values, pagedata).await
-    }
-
-    pub async fn batch(&self, query: &Batch, values: impl BatchValues) -> Result<BatchResult, QueryError> {
-        self.session.batch(query, values).await
-    }
-
-    pub async fn execute(&self, query: &PreparedStatement, values: impl ValueList) -> Result<QueryResult, QueryError> {
-        self.session.execute(&query, values).await
-    }
-}
-
-async fn start_server(app: App) -> Result<()> {
+async fn start_server(app: Connections) -> Result<()> {
     let lp_host = env::var("LP_HOST").unwrap();
     let lp_port = env::var("LP_PORT").unwrap();
     let lp_port: u16 = lp_port.parse().unwrap();
@@ -121,6 +77,6 @@ async fn main() {
     let pool = db::get_pg_connection().await;
     let indexer = db::get_indexer_connection().await;
     
-    let app = App::new(session, pool, indexer);
+    let app = Connections::new(session, pool, indexer);
     start_server(app).await.unwrap();
 }
