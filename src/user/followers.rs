@@ -5,7 +5,7 @@ use serde::{Deserialize};
 use crate::{
     Connections, 
     query::{
-        ADD_USER_CATEGORY, DELETE_CATEGORY
+        FOLLOW_USER, UNFOLLOW_USER
     }
 };
 use validator::Validate;
@@ -15,13 +15,13 @@ use scylla::{
 use crate::auth::AuthSession;
 
 #[derive(Deserialize, Validate, FromRow)]
-pub struct UserCategoryRequest {
-    category: String,
+pub struct User {
+    user_id: String
 }
 
-pub async fn add_category(
+pub async fn follow(
     app: web::Data<Connections>,
-    request: web::Json<UserCategoryRequest>,
+    request: web::Json<User>,
     session: Session
 ) 
 -> Result<HttpResponse, crate::AppError> 
@@ -29,16 +29,16 @@ pub async fn add_category(
     let auth = session.user_info()?;
     let unique_id = time_uuid();
     let _ = app
-    .query(ADD_USER_CATEGORY, (auth.userId, &request.category, &unique_id, &unique_id))
+    .query(FOLLOW_USER, (auth.userId, &request.user_id, &unique_id, &unique_id))
     .await?;
     Ok(
         HttpResponse::Ok().body("Ok")
     )
 }
 
-pub async fn delete_category(
+pub async fn unfollow(
     app: web::Data<Connections>,
-    request: web::Json<UserCategoryRequest>,
+    request: web::Json<User>,
     session: Session
 ) 
 -> Result<HttpResponse, crate::AppError> 
@@ -46,7 +46,7 @@ pub async fn delete_category(
 
     let auth = session.user_info()?;
     let _ = app
-    .query(DELETE_CATEGORY, (auth.userId, &request.category))
+    .query(UNFOLLOW_USER, (auth.userId, &request.user_id))
     .await?;
     Ok(
         HttpResponse::Ok().body("Ok")

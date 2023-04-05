@@ -19,6 +19,8 @@ pub fn routes(config: &mut web::ServiceConfig) {
     .route("/update", web::post().to(user::update))
     .route("/add_category", web::post().to(user::add_category))
     .route("/delete_category", web::post().to(user::delete_category))
+    .route("/follow", web::post().to(user::follow))
+    .route("/unfollow", web::post().to(user::unfollow))
   );
   
   config.service(
@@ -62,5 +64,4 @@ pub fn routes(config: &mut web::ServiceConfig) {
     .route("/update", web::post().to(blognode::update))
     .route("/update_image", web::post().to(blognode::update_image))
   );
-
 }

@@ -100,3 +100,10 @@ pub static CREATE_USER_BOOK_SETTINGS: &str = "INSERT INTO sankar.userbooksetting
 )";
 
 pub static UPDATE_USER_BOOK_SETTINGS: &str = "UPDATE sankar.userbooksettings SET settings=? where authorId=? AND bookId=?";
+
+pub static FOLLOW_USER: &str = "INSERT INTO sankar.followers (
+    userId, followerId, createdAt, updatedAt
+) VALUES(
+    ?, ?, ?, ?
+) IF NOT EXISTS";
+pub static UNFOLLOW_USER: &str = "DELETE FROM sankar.followers WHERE userId=? AND followerId=?";

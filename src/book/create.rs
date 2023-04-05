@@ -39,8 +39,11 @@ pub struct ParentRequest {
 
 #[derive(Serialize)]
 struct AddCategory {
-    id: uuid::Uuid,
-    name: String,
+    doc_id: String,
+    title: String,
+    body: String,
+    user_id: String,
+    createdAt: String,
 }
 
 pub async fn create(
@@ -50,41 +53,37 @@ pub async fn create(
 ) 
 -> Result<HttpResponse, crate::AppError> 
 {
-    // validate
-    if let Err(err) = request.validate() {
-		return Err(crate::AppError::from(err).into());
-	}
+    request.validate()?;
+    let auth = session.user_info()?;
 
-    // init variables
     let identity: i16 = 101;
-    let mut body = String::from("");
-    let mut image_url = None;
     
-    // what if data is null
+    let mut body = String::from("");
     if let Some(b) = &request.body {
         body = b.to_owned();
     }
-    if let Some(b) = &request.image_url {
-        image_url = Some(b.to_owned());
+
+    let mut image_url = None;
+    if let Some(imgurl) = &request.image_url {
+        image_url = Some(imgurl.to_owned());
     }
     
     // generate ids
-    let auth = session.user_info()?;
-    let unique_id = time_uuid();
-    let unique__id = unique_id.to_string();
+    let timeuid = time_uuid();
+    let timeuidstr = timeuid.to_string();
     
     // insert to database
     let batch: Batch = create_batch![CREATE_BOOKS, CREATE_BOOK, CREATE_USER_BOOKS, CREATE_BOOK_TITLE];
     
     let batch_values = (
         // CREATE_BOOKS
-        (&unique_id, &auth.userId, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id),
+        (&timeuid, &auth.userId, &request.title, &body, &image_url, &request.metadata, &timeuid, &timeuid),
         // CREATE_BOOK
-        (&unique_id, &unique_id, &unique_id, &auth.userId, &request.title, &body, &image_url, &identity, &request.metadata, &unique_id, &unique_id),
+        (&timeuid, &timeuid, &timeuid, &auth.userId, &request.title, &body, &image_url, &identity, &request.metadata, &timeuid, &timeuid),
         // CREATE_USER_BOOKS
-        (&unique_id, &auth.userId, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id),
+        (&timeuid, &auth.userId, &request.title, &body, &image_url, &request.metadata, &timeuid, &timeuid),
         // CREATE_BOOK_TITLE
-        (&unique_id, &unique_id, &unique_id, &request.title, &identity)
+        (&timeuid, &timeuid, &timeuid, &request.title, &identity)
     );
     app.batch(&batch, &batch_values).await?;
 
@@ -94,25 +93,26 @@ pub async fn create(
     .await?;
 
     for i in &request.category {
-        app.execute(&prepared, (&i.category, &unique_id, &auth.userId, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id)).await?;
+        app.execute(&prepared, (&i.category, &timeuid, &auth.userId, &request.title, &body, &image_url, &request.metadata, &timeuid, &timeuid)).await?;
     }
-
-    let uunique_id = time_uuid();
 
     for i in &request.category {
         app.query(
             ADD_USER_CATEGORY, 
-            (auth.userId, &i.category, &uunique_id, &uunique_id)
+            (auth.userId, &i.category, &timeuid, &timeuid)
         ).await?;
         if !i.exists {
             app.query(
                 CREATE_ALLCATEGORY, 
-                (&i.category, auth.userId, &uunique_id, &uunique_id)
+                (&i.category, auth.userId, &timeuid, &timeuid)
             ).await?;
             let index = app.indexer.index("categories");
             let doc : Vec<AddCategory> = vec![AddCategory {
-                id: uunique_id.clone(),
-                name: i.category.to_owned(),
+                doc_id: timeuidstr.to_string(),
+                title: request.title.clone(),
+                body: body.clone(),
+                user_id: auth.userId.to_string(), 
+                createdAt: timeuidstr.to_string()
             }];
             index.add_documents(&doc, None).await.unwrap();
         }
@@ -121,9 +121,9 @@ pub async fn create(
     // return response on success
     Ok(
         HttpResponse::Ok().json(json!({
-            "bookId": unique__id.clone(),
-            "pageId": unique__id.clone(),
-            "uniqueId": unique__id.clone(),
+            "bookId": timeuidstr.clone(),
+            "pageId": timeuidstr.clone(),
+            "uniqueId": timeuidstr.clone(),
             "parentId": null,
             "title": request.title.clone(),
             "body": body.clone(),
@@ -131,8 +131,8 @@ pub async fn create(
             "identity": identity,
             "authorId": auth.userId,
             "metadata": request.metadata.clone(),
-            "createdAt": unique__id.clone(),
-            "updatedAt": unique__id.clone(),
+            "createdAt": timeuidstr.clone(),
+            "updatedAt": timeuidstr.clone(),
         }))
     )
 }

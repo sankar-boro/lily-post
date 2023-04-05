@@ -39,11 +39,9 @@ pub async fn signup(
     app: web::Data<Connections>, 
     request: web::Json<SignupForm>
 ) -> Result<HttpResponse, crate::AppError> {
-    let client = app.pool.get().await?;
 
-    if let Err(err) = request.validate() {
-		return Err(AppError::from(err).into());
-	}
+    request.validate()?;
+    let client = app.pool.get().await?;
 
     let password = match encrypt_text(&request.password) {
         Ok(pass) => pass,
@@ -86,14 +84,11 @@ pub async fn signup_admin(
     app: web::Data<Connections>, 
     request: web::Json<AdminForm>
 ) -> Result<HttpResponse, crate::AppError> {
-    
+    request.validate()?;
+
     if &request.user_id > &1 {
         return Err(AppError::from("cannot create admin").into()); 
     }
-    
-    if let Err(err) = request.validate() {
-		return Err(AppError::from(err).into());
-	}
 
     let password = match encrypt_text(&request.password) {
         Ok(pass) => {
