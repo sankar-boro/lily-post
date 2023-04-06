@@ -1,3 +1,5 @@
+#![allow(unused_imports, dead_code)]
+
 #[macro_export]
 macro_rules! create_query {
     ( $a:expr, $( $x:expr ),* ) => {

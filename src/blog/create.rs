@@ -4,7 +4,9 @@ use lily_utils::time_uuid;
 use serde::{Deserialize, Serialize};
 use crate::{
     Connections,
-    query::{ CREATE_BLOGS, CREATE_BLOG, CREATE_USER_BLOGS, CREATE_CATEGORY_BLOGS }
+    query::{ CREATE_BLOGS, CREATE_BLOG, CREATE_USER_BLOGS, 
+        // CREATE_CATEGORY_BLOGS 
+    }
 };
 use scylla::{
     batch::Batch,
@@ -17,7 +19,7 @@ pub struct ParentRequest {
     title: String,
     body: Option<String>,
     metadata: String,
-    category: String,
+    // category: String,
     image_url: Option<String>,
 }
 
@@ -47,7 +49,7 @@ pub async fn create(
     batch.append_statement(CREATE_BLOGS);
     batch.append_statement(CREATE_BLOG);
     batch.append_statement(CREATE_USER_BLOGS);
-    batch.append_statement(CREATE_CATEGORY_BLOGS);
+    // batch.append_statement(CREATE_CATEGORY_BLOGS);
 
     let identity: i16 = 101;
     let mut body = String::from("");
@@ -68,7 +70,7 @@ pub async fn create(
         (&unique_id, auth.userId, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id),
         (&unique_id, &unique_id, auth.userId, &request.title, &body, &image_url, &identity, &request.metadata, &unique_id, &unique_id),
         (&unique_id, auth.userId, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id),
-        (&request.category, &unique_id, auth.userId, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id)
+        // (&request.category, &unique_id, auth.userId, &request.title, &body, &image_url, &request.metadata, &unique_id, &unique_id)
     );
     app.batch(&batch, &batch_values).await?;
     Ok(

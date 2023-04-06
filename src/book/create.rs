@@ -2,13 +2,13 @@ use crate::auth::AuthSession;
 use crate::{
     Connections, 
     query::{
-        CREATE_BOOKS, CREATE_BOOK, CREATE_BOOK_TITLE, ADD_USER_CATEGORY,
-        CREATE_USER_BOOKS, CREATE_CATEGORY_BOOKS, CREATE_ALLCATEGORY
+        CREATE_BOOKS, CREATE_BOOK, CREATE_BOOK_TITLE,
+        CREATE_USER_BOOKS, 
+        // CREATE_CATEGORY_BOOKS, CREATE_ALLCATEGORY, ADD_USER_CATEGORY
     }
 };
 use scylla::FromUserType;
 use scylla::cql_to_rust::{FromCqlVal};
-use scylla::prepared_statement::PreparedStatement;
 use scylla::{
     batch::Batch,
     macros::FromRow
@@ -20,6 +20,7 @@ use lily_utils::time_uuid;
 use actix_web::{HttpResponse, web};
 use serde::{Deserialize, Serialize};
 use crate::create_batch;
+// use scylla::prepared_statement::PreparedStatement;
 
 #[derive(Serialize, Deserialize, FromUserType)]
 struct CategoryData {
@@ -33,7 +34,7 @@ pub struct ParentRequest {
     title: String,
     body: Option<String>,
     metadata: String,
-    category: Vec<CategoryData>,
+    // category: Vec<CategoryData>,
     image_url: Option<String>,
 }
 
@@ -88,35 +89,35 @@ pub async fn create(
     app.batch(&batch, &batch_values).await?;
 
     // Prepare the query for later execution
-    let prepared: PreparedStatement = app.session
-    .prepare(CREATE_CATEGORY_BOOKS)
-    .await?;
+    // let prepared: PreparedStatement = app.session
+    // .prepare(CREATE_CATEGORY_BOOKS)
+    // .await?;
 
-    for i in &request.category {
-        app.execute(&prepared, (&i.category, &timeuid, &auth.userId, &request.title, &body, &image_url, &request.metadata, &timeuid, &timeuid)).await?;
-    }
+    // for i in &request.category {
+    //     app.execute(&prepared, (&i.category, &timeuid, &auth.userId, &request.title, &body, &image_url, &request.metadata, &timeuid, &timeuid)).await?;
+    // }
 
-    for i in &request.category {
-        app.query(
-            ADD_USER_CATEGORY, 
-            (auth.userId, &i.category, &timeuid, &timeuid)
-        ).await?;
-        if !i.exists {
-            app.query(
-                CREATE_ALLCATEGORY, 
-                (&i.category, auth.userId, &timeuid, &timeuid)
-            ).await?;
-            let index = app.indexer.index("categories");
-            let doc : Vec<AddCategory> = vec![AddCategory {
-                doc_id: timeuidstr.to_string(),
-                title: request.title.clone(),
-                body: body.clone(),
-                user_id: auth.userId.to_string(), 
-                createdAt: timeuidstr.to_string()
-            }];
-            index.add_documents(&doc, None).await.unwrap();
-        }
-    }
+    // for i in &request.category {
+        // app.query(
+        //     ADD_USER_CATEGORY, 
+        //     (auth.userId, &i.category, &timeuid, &timeuid)
+        // ).await?;
+        // if !i.exists {
+            // app.query(
+            //     CREATE_ALLCATEGORY, 
+            //     (&i.category, auth.userId, &timeuid, &timeuid)
+            // ).await?;
+        // }
+    // }
+    let index = app.indexer.index("books");
+    let doc : Vec<AddCategory> = vec![AddCategory {
+        doc_id: timeuidstr.to_string(),
+        title: request.title.clone(),
+        body: body.clone(),
+        user_id: auth.userId.to_string(), 
+        createdAt: timeuidstr.to_string()
+    }];
+    index.add_documents(&doc, None).await.unwrap();
 
     // return response on success
     Ok(
