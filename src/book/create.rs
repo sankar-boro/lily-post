@@ -39,11 +39,10 @@ pub struct ParentRequest {
 }
 
 #[derive(Serialize)]
-struct AddCategory {
+struct AddBook {
     doc_id: String,
     title: String,
     body: String,
-    user_id: String,
     createdAt: String,
 }
 
@@ -110,14 +109,13 @@ pub async fn create(
         // }
     // }
     let index = app.indexer.index("books");
-    let doc : Vec<AddCategory> = vec![AddCategory {
+    let search_book : Vec<AddBook> = vec![AddBook {
         doc_id: timeuidstr.to_string(),
         title: request.title.clone(),
         body: body.clone(),
-        user_id: auth.userId.to_string(), 
-        createdAt: timeuidstr.to_string()
+        createdAt: timeuid.to_string()
     }];
-    index.add_documents(&doc, None).await.unwrap();
+    index.add_documents(&search_book, None).await.unwrap();
 
     // return response on success
     Ok(

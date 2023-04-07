@@ -25,7 +25,7 @@ use actix_cors::Cors;
 pub use builder::Connections;
 use error::Error as AppError;
 use actix_web::{web, cookie, App as ActixApp, HttpServer};
-use actix_session::{storage::RedisSessionStore, SessionMiddleware, config::PersistentSession};
+use actix_session::{storage::RedisActorSessionStore, SessionMiddleware, config::PersistentSession};
 
 async fn start_server(app: Connections) -> Result<()> {
     let lp_host = env::var("LP_HOST").unwrap();
@@ -35,7 +35,6 @@ async fn start_server(app: Connections) -> Result<()> {
     let redis_uri = env::var("REDIS_URI").unwrap();
 
     let private_key = cookie::Key::from(pkey.as_bytes());
-    let store = RedisSessionStore::new(&redis_uri).await.unwrap();
 
     HttpServer::new(move || {
         let cors = Cors::default()
@@ -48,7 +47,7 @@ async fn start_server(app: Connections) -> Result<()> {
             .wrap(cors)
             .wrap(
                 SessionMiddleware::builder(
-                    store.clone(),
+                    RedisActorSessionStore::new(&redis_uri),
                     private_key.clone(),
                 )
                 .session_lifecycle(
