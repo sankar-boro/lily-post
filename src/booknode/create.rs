@@ -25,6 +25,15 @@ pub struct AppendNodeRequest {
 }
 
 #[derive(Serialize)]
+struct AddSearchNode {
+    docId: String,
+    nodeId: String,
+    title: String,
+    createdAt: String,
+    updatedAt: String,
+}
+
+#[derive(Serialize)]
 pub struct Response {
     uniqueId: String,
     pageId: Option<String>,
@@ -37,23 +46,23 @@ pub async fn create(
 ) 
 -> Result<HttpResponse, crate::AppError> 
 {   
+    let auth = session.user_info()?;
 
     let mut batch: Batch = Default::default();
     batch.append_statement(CREATE_BOOK_NODE_QUERY);
     batch.append_statement(CREATE_BOOK_TITLE);
 
-    let auth = session.user_info()?;
-    let new_id = time_uuid();
+    let timeuid = time_uuid();
     let mut page_id = None;
     if payload.identity == 104 {
-        page_id = Some(new_id.clone());
+        page_id = Some(timeuid.clone());
     } else {
         if let Some(pageId) = &payload.pageId {
             page_id = Some(pageId.to_uuid()?);
         }
     }
 
-    let new__id = new_id.to_string();
+    let timeuidstr = timeuid.to_string();
     let book_id = &payload.bookId.to_uuid()?;
     let top_unique_id = &payload.topUniqueId.to_uuid()?;
     let mut image_url = None;
@@ -63,18 +72,17 @@ pub async fn create(
     
     let batch_values = ( 
         (
-            &book_id,&page_id,&new_id,&top_unique_id,&auth.userId,&payload.title,
-            &payload.body,&payload.metadata,&image_url,&payload.identity,&new_id,&new_id
+            &book_id,&page_id,&timeuid,&top_unique_id,&auth.userId,&payload.title,
+            &payload.body,&payload.metadata,&image_url,&payload.identity,&timeuid,&timeuid
         ),
         (
-            &book_id, &top_unique_id, &new_id, &payload.title, &payload.identity
+            &book_id, &top_unique_id, &timeuid, &payload.title, &payload.identity
         )
     );
     app.batch(&batch, &batch_values).await?;
 
-    // app.query(CREATE_BOOK_NODE_QUERY, create_data).await?;
     Ok(HttpResponse::Ok().json(Response {
-        uniqueId: new__id.clone(),
+        uniqueId: timeuidstr.clone(),
         pageId: page_id.map(|d: Uuid| d.to_string())
     }))
 }
