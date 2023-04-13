@@ -36,7 +36,7 @@ pub struct ParentRequest {
 }
 
 #[derive(Serialize)]
-struct AddBook {
+struct AddDoc {
     docId: String,
     userId: String,
     title: String,
@@ -87,7 +87,7 @@ pub async fn create(
     app.batch(&batch, &batch_values).await?;
 
     let index = app.indexer.index("books");
-    let search_book : Vec<AddBook> = vec![AddBook {
+    let search_book : Vec<AddDoc> = vec![AddDoc {
         docId: timeuidstr.to_string(),
         userId: auth.userId.to_string(),
         title: payload.title.clone(),
