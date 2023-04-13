@@ -4,7 +4,6 @@ use scylla::Session;
 use scylla::batch::Batch;
 use scylla::query::Query;
 use deadpool_postgres::Pool;
-use meilisearch_sdk::{client::Client};
 use scylla::{QueryResult, BatchResult};
 use scylla::transport::errors::QueryError;
 use scylla::prepared_statement::PreparedStatement;
@@ -14,16 +13,14 @@ use scylla::frame::value::{ValueList, BatchValues};
 #[allow(dead_code)]
 pub struct Connections {
     pub session: Arc<Session>,
-    pub pool: Pool,
-    pub indexer: Client,
+    pub pool: Pool
 }
 
 impl Connections {
-    pub fn new(session: Session, pool: Pool, indexer: Client) -> Self {
+    pub fn new(session: Session, pool: Pool) -> Self {
         Self {
             session: Arc::new(session),
-            pool,
-            indexer
+            pool
         }
     }
 

@@ -35,18 +35,6 @@ pub struct ParentRequest {
     image_url: Option<String>,
 }
 
-#[derive(Serialize)]
-struct AddDoc {
-    docId: String,
-    userId: String,
-    title: String,
-    body: String,
-    uname: String,
-    metadata: String,
-    createdAt: String,
-    updatedAt: String,
-}
-
 pub async fn create(
     app: web::Data<Connections>,
     payload: web::Json<ParentRequest>,
@@ -85,19 +73,6 @@ pub async fn create(
         (&timeuid, &timeuid, &timeuid, &payload.title, &identity)
     );
     app.batch(&batch, &batch_values).await?;
-
-    let index = app.indexer.index("books");
-    let search_book : Vec<AddDoc> = vec![AddDoc {
-        docId: timeuidstr.to_string(),
-        userId: auth.userId.to_string(),
-        title: payload.title.clone(),
-        body: body.clone(),
-        uname: format!("{} {}", &auth.fname, &auth.lname),
-        metadata: payload.metadata.clone(),
-        createdAt: timeuid.to_string(),
-        updatedAt: timeuid.to_string()
-    }];
-    index.add_documents(&search_book, None).await.unwrap();
 
     Ok(
         HttpResponse::Ok().json(json!({

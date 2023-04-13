@@ -200,15 +200,6 @@ impl From<SessionGetError> for Error {
     }
 }
 
-impl From<meilisearch_sdk::errors::Error> for Error {
-    fn from(e: meilisearch_sdk::errors::Error) -> Self {
-        Error {
-            status: StatusCode::INTERNAL_SERVER_ERROR,
-            message: e.to_string(),
-        }
-    }
-}
-
 #[derive(Serialize)]
 pub struct ErrorResponse {
     status: u16,

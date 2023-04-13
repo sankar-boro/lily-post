@@ -74,8 +74,7 @@ async fn main() {
     
     let session = db::get_scylla_connection().await;
     let pool = db::get_pg_connection().await;
-    let indexer = db::get_indexer_connection().await;
     
-    let app = Connections::new(session, pool, indexer);
+    let app = Connections::new(session, pool);
     start_server(app).await.unwrap();
 }

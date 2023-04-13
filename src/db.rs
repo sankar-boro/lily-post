@@ -1,7 +1,6 @@
 use std::env;
 use tokio_postgres::NoTls;
 use scylla::{Session, SessionBuilder};
-use meilisearch_sdk::{client::Client};
 use deadpool_postgres::{Config, ManagerConfig, Pool, RecyclingMethod, Runtime};
 
 pub async fn get_pg_connection() -> Pool {
@@ -23,10 +22,4 @@ pub async fn get_scylla_connection() -> Session {
     let db_uri = env::var("DB_URI").unwrap();
     let session = SessionBuilder::new().known_node(db_uri).build().await.unwrap();
     session
-}
-
-pub async fn get_indexer_connection() -> Client {
-    let indexer_uri = env::var("INDEXER_URI").unwrap();
-    let indexer = Client::new(indexer_uri, Some("authUser"));
-    indexer
 }
