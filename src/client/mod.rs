@@ -1,10 +1,12 @@
+#![allow(dead_code, unused_variables)]
+
 use crate::AppError;
 use log::{error, trace, warn};
 use serde::{de::DeserializeOwned, Serialize};
 use serde_json::{from_str, to_string};
 
 #[derive(Debug)]
-pub(crate) enum Method<Q, B> {
+pub enum Method<Q, B> {
     Get { query: Q },
     Post { query: Q, body: B },
     Patch { query: Q, body: B },
@@ -24,7 +26,7 @@ pub fn add_query_parameters<Query: Serialize>(url: &str, query: &Query) -> Resul
 
 }
 
-pub(crate) async fn request<
+pub async fn request<
     Query: Serialize,
     Body: Serialize,
     Output: DeserializeOwned + 'static,
@@ -49,7 +51,7 @@ pub(crate) async fn request<
                 .method(HttpMethod::GET)
                 .uri(url)
                 .body(())
-                .map_err(|_| "".to_string())?
+                .map_err(|e| e.to_string())?
                 .send_async()
                 .await.unwrap()
         }
@@ -60,7 +62,7 @@ pub(crate) async fn request<
                 .method(HttpMethod::DELETE)
                 .uri(url)
                 .body(())
-                .map_err(|_| "".to_string())?
+                .map_err(|e| e.to_string())?
                 .send_async()
                 .await.unwrap()
         }
@@ -72,7 +74,7 @@ pub(crate) async fn request<
                 .uri(url)
                 .header(header::CONTENT_TYPE, "application/json")
                 .body(to_string(&body).unwrap())
-                .map_err(|_| "".to_string())?
+                .map_err(|e| e.to_string())?
                 .send_async()
                 .await.unwrap()
         }
@@ -84,7 +86,7 @@ pub(crate) async fn request<
                 .uri(url)
                 .header(header::CONTENT_TYPE, "application/json")
                 .body(to_string(&body).unwrap())
-                .map_err(|_| "".to_string())?
+                .map_err(|e| e.to_string())?
                 .send_async()
                 .await.unwrap()
         }
@@ -96,7 +98,7 @@ pub(crate) async fn request<
                 .uri(url)
                 .header(header::CONTENT_TYPE, "application/json")
                 .body(to_string(&body).unwrap())
-                .map_err(|_| "".to_string())?
+                .map_err(|e| e.to_string())?
                 .send_async()
                 .await.unwrap()
         }
@@ -107,7 +109,7 @@ pub(crate) async fn request<
     let mut body = response
         .text()
         .await
-        .map_err(|_| "".to_string()).unwrap();
+        .map_err(|e| e.to_string()).unwrap();
 
     if body.is_empty() {
         body = "null".to_string();
@@ -116,7 +118,7 @@ pub(crate) async fn request<
     parse_response(status, expected_status_code, body)
 }
 
-pub(crate) async fn stream_request<
+pub async fn stream_request<
     'a,
     Query: Serialize,
     Body: futures_io::AsyncRead + Send + Sync + 'static,
@@ -146,7 +148,7 @@ pub(crate) async fn stream_request<
                 .method(HttpMethod::GET)
                 .uri(url)
                 .body(())
-                .map_err(|_| "".to_string())?
+                .map_err(|e| e.to_string())?
                 .send_async()
                 .await.unwrap()
         }
@@ -157,7 +159,7 @@ pub(crate) async fn stream_request<
                 .method(HttpMethod::DELETE)
                 .uri(url)
                 .body(())
-                .map_err(|_| "".to_string())?
+                .map_err(|e| e.to_string())?
                 .send_async()
                 .await.unwrap()
         }
@@ -169,7 +171,7 @@ pub(crate) async fn stream_request<
                 .uri(url)
                 .header(header::CONTENT_TYPE, content_type)
                 .body(AsyncBody::from_reader(body))
-                .map_err(|_| "".to_string())?
+                .map_err(|e| e.to_string())?
                 .send_async()
                 .await.unwrap()
         }
@@ -181,7 +183,7 @@ pub(crate) async fn stream_request<
                 .uri(url)
                 .header(header::CONTENT_TYPE, content_type)
                 .body(AsyncBody::from_reader(body))
-                .map_err(|_| "".to_string())?
+                .map_err(|e| e.to_string())?
                 .send_async()
                 .await.unwrap()
         }
@@ -193,7 +195,7 @@ pub(crate) async fn stream_request<
                 .uri(url)
                 .header(header::CONTENT_TYPE, content_type)
                 .body(AsyncBody::from_reader(body))
-                .map_err(|_| "".to_string())?
+                .map_err(|e| e.to_string())?
                 .send_async()
                 .await.unwrap()
         }
@@ -204,10 +206,10 @@ pub(crate) async fn stream_request<
     let mut body = response
         .text()
         .await
-        .map_err(|_| "".to_string())?;
+        .map_err(|e| e.to_string())?;
 
     if body.is_empty() {
-        body = "null".to_string();
+        body = "".to_string();
     }
 
     parse_response(status, expected_status_code, body)

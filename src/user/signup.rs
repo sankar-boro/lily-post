@@ -1,4 +1,6 @@
 use crate::{Connections, AppError};
+use crate::client::{self, Method};
+use serde_json::{json, Value};
 
 use regex::Regex;
 use serde::{Deserialize};
@@ -42,8 +44,25 @@ pub async fn signup(
     let lname = &request.lname.trim();
     let email = &request.email.trim();
     let stmt = client.prepare_cached(INSERT_USER).await?;
-    client.query_opt(&stmt, &[fname, lname, email, &password]).await?;
+    let rows = client.query(&stmt, &[fname, lname, email, &password]).await?;
+	let user_id: i32 = rows[0].get(0);
 
+    client::request::<(), Value, ()>(
+        "http://localhost:7705/v2/add_document",
+        "lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+        Method::Post {
+            query: (),
+            body: json!({
+                "index_name": "users",
+                "data": json!({
+                    "userId": user_id,
+                    "fname": fname,
+                    "lname": lname
+                }).to_string(),
+            }),
+        },
+        200,
+    ).await?;
     Ok(HttpResponse::Ok().body("Ok"))
 }
 
@@ -86,7 +105,25 @@ pub async fn signup_admin(
     let lname = &request.lname.trim();
     let email = &request.email.trim();
     let stmt = client.prepare_cached(INSERT_USER_ADMIN).await?;
-    client.query(&stmt, &[&request.user_id, fname, lname, email, &password]).await?;
+    let rows = client.query(&stmt, &[&request.user_id, fname, lname, email, &password]).await?;
+	let user_id: i32 = rows[0].get(0);
 
+    client::request::<(), Value, ()>(
+        "http://localhost:7705/v2/add_document",
+        "lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+        Method::Post {
+            query: (),
+            body: json!({
+                "index_name": "users",
+                "data": json!({
+                    "userId": user_id,
+                    "fname": fname,
+                    "lname": lname
+                }).to_string(),
+            }),
+        },
+        200,
+    ).await?;
+    
     Ok(HttpResponse::Ok().body("Ok"))
 }
