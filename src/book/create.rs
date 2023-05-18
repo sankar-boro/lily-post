@@ -74,6 +74,8 @@ pub async fn create(
     );
     app.batch(&batch, &batch_values).await?;
 
+    
+
     Ok(
         HttpResponse::Ok().json(json!({
             "bookId": timeuidstr.clone(),

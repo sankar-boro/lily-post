@@ -17,6 +17,7 @@ mod settings;
 mod batch;
 mod db;
 mod builder;
+mod request;
 
 use std::env;
 use time::Duration;
