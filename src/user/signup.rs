@@ -62,6 +62,7 @@ pub async fn signup(
             }),
         },
         200,
+        "DOCUMENT_ADDED"
     ).await?;
     Ok(HttpResponse::Ok().body("Ok"))
 }
@@ -123,6 +124,7 @@ pub async fn signup_admin(
             }),
         },
         200,
+        "DOCUMENT_ADDED"
     ).await?;
     
     Ok(HttpResponse::Ok().body("Ok"))

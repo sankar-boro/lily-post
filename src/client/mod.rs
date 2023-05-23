@@ -1,9 +1,6 @@
 #![allow(dead_code, unused_variables)]
 
-use std::println;
-
 use crate::AppError;
-use isahc::{Response, AsyncBody};
 use log::{error, trace, warn};
 use serde::{de::DeserializeOwned, Serialize};
 use serde_json::{from_str, to_string};
@@ -32,13 +29,13 @@ pub fn add_query_parameters<Query: Serialize>(url: &str, query: &Query) -> Resul
 pub async fn request<
     Query: Serialize,
     Body: Serialize,
-    // Output: DeserializeOwned + 'static,
 >(
     url: &str,
     apikey: &str,
     method: Method<Query, Body>,
     expected_status_code: u16,
-) -> Result<Response<AsyncBody>, AppError> {
+    expected_message: &str
+) -> Result<(), AppError> {
     use isahc::http::header;
     use isahc::http::method::Method as HttpMethod;
     use isahc::*;
@@ -46,7 +43,7 @@ pub async fn request<
     let builder = Request::builder().header(header::USER_AGENT, qualified_version());
     let builder = builder.header(header::AUTHORIZATION, format!("Bearer {apikey}"));
 
-    let response = match &method {
+    let mut response = match &method {
         Method::Get { query } => {
             let url = add_query_parameters(url, query)?;
 
@@ -107,7 +104,21 @@ pub async fn request<
         }
     };
 
-    Ok(response)
+    let status_code = response.status().as_u16();
+
+    let body = response
+    .text()
+    .await
+    .map_err(|e| e.to_string())?;
+
+    if status_code == expected_status_code {
+        if body == expected_message {
+            return Ok(());
+        }
+    }
+
+    Err(AppError::from("").into())
+
 }
 
 pub async fn stream_request<
@@ -208,7 +219,6 @@ fn parse_response<Output: DeserializeOwned>(
     expected_status_code: u16,
     body: String,
 ) -> Result<Output, AppError> {
-    println!("body: {}", body);
     if status_code == expected_status_code {
         match from_str::<Output>(&body) {
             Ok(output) => {
@@ -234,53 +244,3 @@ pub fn qualified_version() -> String {
 
     format!("Lily Search (v{})", VERSION.unwrap_or("unknown"))
 }
-
-#[cfg(test)]
-mod test { 
-    use super::*;
-    use serde_json::{json, Value};
-    use futures::executor::block_on;
-    
-    #[test]
-    fn test_get_request() {
-        block_on(async move {
-            request::<(), ()>(
-                &format!("{}/indexes/{}", "http", "uuid"),
-                "apiKey",
-                Method::Get { query: () },
-                200,
-            )
-            .await.unwrap();
-        });
-    }
-
-    #[test]
-    fn test_post_request() {
-        block_on(async move {
-            request::<(), Value>(
-                &format!("{}/indexes", "http://localhost:7700"),
-                "apiKey",
-                Method::Post {
-                    query: (),
-                    body: json!({
-                        "uid": "uuid",
-                        "primaryKey": "primaryKey",
-                    }),
-                },
-                202,
-            ).await.unwrap();
-        });
-    }
-}
-
-
-// ############################################################
-
-// let status = response.status().as_u16();
-
-// let body = response
-// .text()
-// .await
-// .map_err(|e| e.to_string())?;
-
-// parse_response(status, expected_status_code, body)

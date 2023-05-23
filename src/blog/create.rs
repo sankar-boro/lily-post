@@ -70,6 +70,7 @@ pub async fn create(
             }),
         },
         200,
+        "DOCUMENT_ADDED"
     ).await?;
 
     Ok(
