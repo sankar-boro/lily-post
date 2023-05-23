@@ -27,6 +27,10 @@ pub struct SignupForm {
     password: String,
 }
 
+#[derive(Deserialize, Debug)]
+struct ResData {
+}
+
 pub async fn signup(
     app: web::Data<Connections>, 
     request: web::Json<SignupForm>
@@ -47,7 +51,7 @@ pub async fn signup(
     let rows = client.query(&stmt, &[fname, lname, email, &password]).await?;
 	let user_id: i32 = rows[0].get(0);
 
-    client::request::<(), Value, ()>(
+    client::request::<(), Value, ResData>(
         "http://localhost:7705/v2/add_document",
         "lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
         Method::Post {
@@ -108,7 +112,7 @@ pub async fn signup_admin(
     let rows = client.query(&stmt, &[&request.user_id, fname, lname, email, &password]).await?;
 	let user_id: i32 = rows[0].get(0);
 
-    client::request::<(), Value, ()>(
+    client::request::<(), Value, String>(
         "http://localhost:7705/v2/add_document",
         "lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
         Method::Post {

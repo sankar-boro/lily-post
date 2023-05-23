@@ -1,5 +1,7 @@
 #![allow(dead_code, unused_variables)]
 
+use std::println;
+
 use crate::AppError;
 use log::{error, trace, warn};
 use serde::{de::DeserializeOwned, Serialize};
@@ -111,9 +113,9 @@ pub async fn request<
         .await
         .map_err(|e| e.to_string()).unwrap();
 
-    if body.is_empty() {
-        body = "null".to_string();
-    }
+    // if body.is_empty() {
+        body = "{}".to_string();
+    // }
 
     parse_response(status, expected_status_code, body)
 }
@@ -208,9 +210,9 @@ pub async fn stream_request<
         .await
         .map_err(|e| e.to_string())?;
 
-    if body.is_empty() {
-        body = "".to_string();
-    }
+    // if body.is_empty() {
+        body = "{}".to_string();
+    // }
 
     parse_response(status, expected_status_code, body)
 }
@@ -220,6 +222,7 @@ fn parse_response<Output: DeserializeOwned>(
     expected_status_code: u16,
     body: String,
 ) -> Result<Output, AppError> {
+    println!("body: {}", body);
     if status_code == expected_status_code {
         match from_str::<Output>(&body) {
             Ok(output) => {
@@ -228,7 +231,8 @@ fn parse_response<Output: DeserializeOwned>(
             }
             Err(e) => {
                 error!("Request succeeded but failed to parse response");
-                return Err(AppError::from("").into());
+                println!("error: {}", e);
+                return Err(AppError::from(e).into());
             }
         };
     }

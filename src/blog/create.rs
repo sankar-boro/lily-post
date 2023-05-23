@@ -11,7 +11,8 @@ use scylla::{
     macros::FromRow
 };
 use crate::auth::AuthSession;
-use serde_json::json;
+use serde_json::{json, Value};
+use crate::client::{self, Method};
 
 #[derive(Deserialize, FromRow)]
 pub struct ParentRequest {
@@ -20,6 +21,11 @@ pub struct ParentRequest {
     metadata: String,
     image_url: Option<String>,
 }
+
+#[derive(Deserialize, Debug)]
+struct ResData {
+}
+
 
 pub async fn create(
     app: web::Data<Connections>, 
@@ -53,6 +59,23 @@ pub async fn create(
         (&timeuid, auth.userId, &payload.title, &body, &image_url, &payload.metadata, &timeuid, &timeuid)
     );
     app.batch(&batch, &batch_values).await?;
+
+    client::request::<(), Value, ResData>(
+        "http://localhost:7705/v2/add_document",
+        "lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+        Method::Post {
+            query: (),
+            body: json!({
+                "index_name": "blogs",
+                "data": json!({
+                    "docId": timeuid,
+                    "title": &payload.title,
+                    "body": body
+                }).to_string(),
+            }),
+        },
+        200,
+    ).await?;
 
     Ok(
         HttpResponse::Ok().json(json!({

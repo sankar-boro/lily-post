@@ -12,13 +12,14 @@ use scylla::{
     batch::Batch,
     macros::FromRow
 };
-use serde_json::json;
 use validator::Validate;
 use actix_session::Session;
 use lily_utils::time_uuid;
 use actix_web::{HttpResponse, web};
 use serde::{Deserialize, Serialize};
 use crate::create_batch;
+use crate::client::{self, Method};
+use serde_json::{json, Value};
 
 #[derive(Serialize, Deserialize, FromUserType)]
 struct CategoryData {
@@ -33,6 +34,10 @@ pub struct ParentRequest {
     body: Option<String>,
     metadata: String,
     image_url: Option<String>,
+}
+
+#[derive(Deserialize, Debug)]
+struct ResData {
 }
 
 pub async fn create(
@@ -74,7 +79,22 @@ pub async fn create(
     );
     app.batch(&batch, &batch_values).await?;
 
-    
+    client::request::<(), Value, ResData>(
+        "http://localhost:7705/v2/add_document",
+        "lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+        Method::Post {
+            query: (),
+            body: json!({
+                "index_name": "books",
+                "data": json!({
+                    "docId": timeuid,
+                    "title": &payload.title,
+                    "body": body
+                }).to_string(),
+            }),
+        },
+        200,
+    ).await?;
 
     Ok(
         HttpResponse::Ok().json(json!({
