@@ -22,11 +22,6 @@ pub struct ParentRequest {
     image_url: Option<String>,
 }
 
-#[derive(Deserialize, Debug)]
-struct ResData {
-}
-
-
 pub async fn create(
     app: web::Data<Connections>, 
     payload: web::Json<ParentRequest>,
@@ -60,7 +55,7 @@ pub async fn create(
     );
     app.batch(&batch, &batch_values).await?;
 
-    client::request::<(), Value, ResData>(
+    client::request::<(), Value>(
         "http://localhost:7705/v2/add_document",
         "lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
         Method::Post {
