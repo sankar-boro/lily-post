@@ -20,7 +20,6 @@ pub mod builder;
 pub mod client;
 pub use builder::Connections;
 pub use error::Error as AppError;
-pub use time::Duration;
 
 pub async fn get_scylla_db_connection() -> Connections {
 

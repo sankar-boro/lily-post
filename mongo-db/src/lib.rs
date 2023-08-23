@@ -3,6 +3,7 @@
 pub mod user;
 pub mod error;
 pub mod model;
+pub mod route;
 
 use mongodb::Client;
 

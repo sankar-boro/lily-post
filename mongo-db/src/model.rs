@@ -1,29 +1,7 @@
 use actix_web::{web, HttpResponse};
-use mongodb::{bson::doc, bson::oid::ObjectId, Client};
+use bson::oid::ObjectId;
+use mongodb::{bson::doc, Client};
 use serde::{Deserialize, Serialize};
-
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-pub struct User {
-    pub fname: String,
-    pub lname: String,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-pub struct Post {
-    pub _id: ObjectId,
-    pub title: String,
-    pub body: String,
-    pub user_id: ObjectId,
-    pub group: Option<String>,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-pub struct AddPost {
-    pub title: String,
-    pub body: String,
-    pub user_id: ObjectId,
-    pub group: Option<String>,
-}
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct AddUser {
@@ -34,21 +12,26 @@ pub struct AddUser {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-pub struct UpdatePost {
-    pub _id: String,
-    pub title: String,
-    pub body: String,
+pub struct User {
+  pub _id: ObjectId,
+  pub email: String,
+  pub fname: String,
+  pub lname: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct UpdateUser {
+  pub _id: String,
+  pub email: String,
+  pub fname: String,
+  pub lname: String,
+  pub password: Option<String>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct NewCollection {
     pub name: String,
     pub dbname: String,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-pub struct NewGroup {
-    pub name: String,
 }
 
 /// Adds a new user to the "users" collection in the database.
