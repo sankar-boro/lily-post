@@ -1,23 +1,35 @@
+mod cli;
+
 use std::env;
+use cli::Opts;
+use clap::Parser;
 use anyhow::Result;
 use actix_cors::Cors;
-use scylla_db::{Connections, Duration, db, route};
+use actix_web::middleware::Condition;
+use scylla_db::{get_scylla_db_connection, Duration, route};
+use mongo_db::{get_mongo_db_connection};
 use actix_web::{web, cookie, App as ActixApp, HttpServer};
 use actix_session::{storage::RedisActorSessionStore, SessionMiddleware, config::PersistentSession};
 
-async fn start_server(app: Connections) -> Result<()> {
+async fn start_server<T: Clone + Send + 'static>(app: T) -> Result<()> {
+    
     let lp_host = env::var("LP_HOST").unwrap();
     let lp_port = env::var("LP_PORT").unwrap();
     let lp_port: u16 = lp_port.parse().unwrap();
     let pkey = env::var("PRIVATE_KEY").unwrap();
     let redis_uri = env::var("REDIS_URI").unwrap();
+    let dev = env::var("DEV").unwrap();
+    let dev: bool = match dev.as_str() {
+        "TRUE" => true,
+        _ => false
+    };
 
     let private_key = cookie::Key::from(pkey.as_bytes());
 
     HttpServer::new(move || {
 
         ActixApp::new()
-            .wrap(Cors::permissive())
+            .wrap(Condition::new(dev, Cors::permissive()))
             .wrap(
                 SessionMiddleware::builder(
                     RedisActorSessionStore::new(&redis_uri),
@@ -44,10 +56,6 @@ async fn main() {
     std::env::set_var("RUST_LOG", "info");
     std::env::set_var("RUST_BACKTRACE", "1");
     env_logger::init();
-    
-    let session = db::get_scylla_connection().await;
-    let pool = db::get_pg_connection().await;
-    
-    let app = Connections::new(session, pool);
-    start_server(app).await.unwrap();
+    let conn = get_mongo_db_connection().await;
+    start_server(conn).await.unwrap();
 }

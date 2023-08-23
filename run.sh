@@ -8,6 +8,7 @@ REDIS_URI="127.0.0.1:6379" \
 DB_URI="127.0.0.1:9042" \
 INDEXER_URI="http://localhost:7700" \
 LP_HOST=localhost \
+DEV=TRUE \
 LP_PORT=7501 \
 ./target/release/lily_post
 

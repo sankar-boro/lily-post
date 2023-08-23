@@ -22,6 +22,14 @@ pub use builder::Connections;
 pub use error::Error as AppError;
 pub use time::Duration;
 
+pub async fn get_scylla_db_connection() -> Connections {
+
+  let session = db::get_scylla_connection().await;
+  let pool = db::get_pg_connection().await;
+  
+  let conn = Connections::new(session, pool);
+  conn
+}
 // use std::env;
 // use anyhow::Result;
 // use actix_cors::Cors;
