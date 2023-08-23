@@ -1,30 +1,7 @@
-#![allow(non_snake_case)]
-
-#[macro_use]
-extern crate lazy_static;
-mod route;
-mod user;
-mod helpers;
-mod utils;
-mod error;
-mod query;
-mod book;
-mod blog;
-mod auth;
-mod booknode;
-mod blognode;
-mod settings;
-mod batch;
-mod db;
-mod builder;
-mod client;
-
 use std::env;
-use time::Duration;
 use anyhow::Result;
 use actix_cors::Cors;
-pub use builder::Connections;
-use error::Error as AppError;
+use scylla_db::{Connections, Duration, db, route};
 use actix_web::{web, cookie, App as ActixApp, HttpServer};
 use actix_session::{storage::RedisActorSessionStore, SessionMiddleware, config::PersistentSession};
 
@@ -38,14 +15,9 @@ async fn start_server(app: Connections) -> Result<()> {
     let private_key = cookie::Key::from(pkey.as_bytes());
 
     HttpServer::new(move || {
-        let cors = Cors::default()
-              .allow_any_origin()
-              .allow_any_method()
-              .allow_any_header()
-              .supports_credentials();
 
         ActixApp::new()
-            .wrap(cors)
+            .wrap(Cors::permissive())
             .wrap(
                 SessionMiddleware::builder(
                     RedisActorSessionStore::new(&redis_uri),
