@@ -28,6 +28,30 @@ pub struct UpdateUser {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct Book {
+    pub _id: ObjectId,
+    pub title: String,
+    pub body: String,
+    pub metadata: String,
+    pub image_url: Option<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct AddBook {
+    pub title: String,
+    pub body: String,
+    pub metadata: String,
+    pub image_url: Option<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct UpdateBook {
+  pub title: Option<String>,
+  pub body: Option<String>,
+  pub metadata: Option<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct NewCollection {
     pub name: String,
     pub dbname: String,
