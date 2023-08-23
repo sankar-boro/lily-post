@@ -1,13 +1,11 @@
 mod cli;
 
 use std::env;
-use cli::Opts;
-use clap::Parser;
 use anyhow::Result;
 use actix_cors::Cors;
 use actix_web::middleware::Condition;
-use scylla_db::{get_scylla_db_connection, Duration, route};
-use mongo_db::{get_mongo_db_connection};
+use scylla_db::{Duration, route};
+use mongo_db::get_mongo_db_connection;
 use actix_web::{web, cookie, App as ActixApp, HttpServer};
 use actix_session::{storage::RedisActorSessionStore, SessionMiddleware, config::PersistentSession};
 

@@ -1,33 +1,22 @@
-use crate::{AppError};
-use mongodb::Client;
+use crate::model::AddUser;
 
-use regex::Regex;
-use serde::{Deserialize};
-use validator::{Validate};
-use actix_web::{HttpResponse, web};
-use lily_utils::{encrypt_text};
+use actix_web::{web, HttpResponse};
+use mongodb::{bson::doc, Client};
 
-lazy_static! {
-  static ref MATCH_NAME: Regex = Regex::new(r"^[A-Za-z][A-Za-z0-9_]{2,29}$").unwrap();
-}
+const DB_NAME: &str = "sankar";
+const COLL_NAME: &str = "users";
 
-#[derive(Deserialize, Validate)]
-pub struct SignupForm {
-    #[validate(regex = "MATCH_NAME")]
-    fname: String,
-    #[validate(regex = "MATCH_NAME")]
-    lname: String,
-    #[validate(email)]
-    email: String,
-    #[validate(length(min = 6))]
-    password: String,
-}
-
-pub async fn signup(
-    app: Client, 
-    request: web::Json<SignupForm>
-) -> Result<HttpResponse, crate::AppError> {
-
-    request.validate()?;
-    todo!()
+pub async fn add_user(client: web::Data<Client>, form: web::Json<AddUser>) -> HttpResponse {
+    let collection = client.database(DB_NAME).collection(COLL_NAME);
+    let new_post = doc! { 
+        "email": &form.email, 
+        "fname": &form.fname, 
+        "lname": &form.lname,
+        "password": &form.password
+    };
+    let result = collection.insert_one(new_post, None).await;
+    match result {
+        Ok(_) => HttpResponse::Ok().body("post added"),
+        Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
+    }
 }

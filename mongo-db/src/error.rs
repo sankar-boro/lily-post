@@ -1,20 +1,17 @@
 use serde_json;
-use serde::{Serialize};
+use serde::Serialize;
 
-use actix_web::{
-    http::{StatusCode},
-    HttpResponse,
-};
+use actix_web::{http::StatusCode, HttpResponse};
 use derive_more::Display;
 
 #[derive(Display, Debug)]
 #[display(fmt = "status: {}", status)]
-pub struct Error {
+pub struct HttpErrorResponse {
     status: StatusCode,
     message: String,
 }
 
-impl Error {
+impl HttpErrorResponse {
     pub fn get_status(&self) -> StatusCode {
         self.status
     }
@@ -24,52 +21,52 @@ impl Error {
     }
 }
 
-impl From<anyhow::Error> for Error {
+impl From<anyhow::Error> for HttpErrorResponse {
     fn from(e: anyhow::Error) -> Self {
-        Error {
+        HttpErrorResponse {
             status: StatusCode::INTERNAL_SERVER_ERROR,
             message: e.to_string(),
         }
     }
 }
 
-impl From<mongodb::error::Error> for Error {
+impl From<mongodb::error::Error> for HttpErrorResponse {
     fn from(e: mongodb::error::Error) -> Self {
-        Error {
+        HttpErrorResponse {
             status: StatusCode::INTERNAL_SERVER_ERROR,
             message: e.to_string(),
         }
     }
 }
 
-impl From<validator::ValidationErrors> for Error {
+impl From<validator::ValidationErrors> for HttpErrorResponse {
     fn from(e: validator::ValidationErrors) -> Self {
         let x = e.errors();
         if x.contains_key("email") {
-            return Error {
+            return HttpErrorResponse {
                 status: StatusCode::from_u16(400).unwrap(),
                 message: "invalid_email".to_string(),
             };
         }
         if x.contains_key("password") {
-            return Error {
+            return HttpErrorResponse {
                 status: StatusCode::from_u16(400).unwrap(),
                 message: "invalid_password".to_string(),
             };
         }
         if x.contains_key("fname") {
-            return Error {
+            return HttpErrorResponse {
                 status: StatusCode::from_u16(400).unwrap(),
                 message: "invalid_fname".to_string(),
             };
         }
         if x.contains_key("lname") {
-            return Error {
+            return HttpErrorResponse {
                 status: StatusCode::from_u16(400).unwrap(),
                 message: "invalid_lname".to_string(),
             };
         }
-        Error {
+        HttpErrorResponse {
             status: StatusCode::INTERNAL_SERVER_ERROR,
             message: e.to_string(),
         }
@@ -77,36 +74,36 @@ impl From<validator::ValidationErrors> for Error {
 }
 
 //
-impl From<String> for Error {
+impl From<String> for HttpErrorResponse {
     fn from(e: String) -> Self {
-        Error {
+        HttpErrorResponse {
             status: StatusCode::INTERNAL_SERVER_ERROR,
             message: e,
         }
     }
 }
 
-impl From<&str> for Error {
+impl From<&str> for HttpErrorResponse {
     fn from(e: &str) -> Self {
-        Error {
+        HttpErrorResponse {
             status: StatusCode::INTERNAL_SERVER_ERROR,
             message: e.to_string(),
         }
     }
 }
 
-impl From<actix_web::Error> for Error {
+impl From<actix_web::Error> for HttpErrorResponse {
     fn from(e: actix_web::Error) -> Self {
-        Error {
+        HttpErrorResponse {
             status: StatusCode::INTERNAL_SERVER_ERROR,
             message: e.to_string(),
         }
     }
 }
 
-impl From<serde_json::Error> for Error {
+impl From<serde_json::Error> for HttpErrorResponse {
     fn from(e: serde_json::Error) -> Self {
-        Error {
+        HttpErrorResponse {
             status: StatusCode::INTERNAL_SERVER_ERROR,
             message: e.to_string(),
         }
@@ -119,7 +116,7 @@ pub struct ErrorResponse {
     message: String,
 }
 
-impl actix_web::ResponseError for Error {
+impl actix_web::ResponseError for HttpErrorResponse {
     fn status_code(&self) -> StatusCode {
         self.get_status()
     }
