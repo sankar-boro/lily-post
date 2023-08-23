@@ -2155,7 +2155,16 @@ dependencies = [
 name = "mongo_db"
 version = "0.1.0"
 dependencies = [
+ "actix-web",
+ "anyhow",
+ "derive_more",
+ "lazy_static",
+ "lily-utils",
  "mongodb",
+ "regex",
+ "serde",
+ "serde_json",
+ "validator",
 ]
 
 [[package]]
