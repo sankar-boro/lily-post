@@ -21,10 +21,9 @@ pub struct User {
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct UpdateUser {
-  pub _id: String,
-  pub email: String,
-  pub fname: String,
-  pub lname: String,
+  pub email: Option<String>,
+  pub fname: Option<String>,
+  pub lname: Option<String>,
   pub password: Option<String>,
 }
 
