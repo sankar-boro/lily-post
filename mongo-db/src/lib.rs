@@ -5,7 +5,7 @@ pub mod error;
 pub mod model;
 pub mod route;
 pub mod book;
-pub mod booknode;
+pub mod book_node;
 
 use mongodb::Client;
 

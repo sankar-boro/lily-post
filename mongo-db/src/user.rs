@@ -6,6 +6,7 @@ use crate::{
     error::HttpErrorResponse
 };
 
+use actix_session::Session;
 use actix_web::{web, HttpResponse};
 use mongodb::{bson::{doc, oid::ObjectId}, Client, Collection};
 use lily_utils::encrypt_text;
@@ -42,7 +43,7 @@ pub async fn login(client: web::Data<Client>, form: web::Json<LoginUser>, sessio
           "fname": &get_user.fname, 
           "lname": &get_user.lname
       };
-    session.insert(AUTH_USER, &login_user)?;
+    session.insert(AUTH_USER, &login_user.to_string())?;
     return Ok(HttpResponse::Ok().json(login_user));
   }
 
@@ -91,5 +92,16 @@ pub async fn update_user(client: web::Data<Client>, data: web::Json<UpdateUser>,
     match result {
         Ok(res) => Ok(HttpResponse::Ok().json(res)),
         Err(err) => Err(HttpErrorResponse::from(err.to_string())),
+    }
+}
+
+pub async fn user_session(session: Session) 
+-> Result<HttpResponse, HttpErrorResponse> {
+    let auth_user_session = session.get::<String>("AUTH_USER")?;
+    match auth_user_session {
+        Some(session) => {
+            Ok(HttpResponse::Ok().body(session))
+        }
+        None => Err(HttpErrorResponse::from("session error".to_string())) 
     }
 }

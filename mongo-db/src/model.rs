@@ -3,6 +3,10 @@ use bson::oid::ObjectId;
 use mongodb::{bson::doc, Client};
 use serde::{Deserialize, Serialize};
 
+/* 
+  User 
+*/
+
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct AddUser {
     pub email: String,
@@ -42,8 +46,15 @@ pub struct UpdateUser {
   pub password: Option<String>,
 }
 
+/* 
+  User 
+*/
+
+/*
+  Book
+*/
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-pub struct Book {
+pub struct GetBook {
     pub _id: ObjectId,
     pub title: String,
     pub body: String,
@@ -52,11 +63,17 @@ pub struct Book {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct DeleteBook {
+    pub _id: ObjectId
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct AddBook {
     pub title: String,
     pub body: String,
     pub metadata: String,
     pub image_url: Option<String>,
+    pub book_id: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
@@ -65,6 +82,52 @@ pub struct UpdateBook {
   pub body: Option<String>,
   pub metadata: Option<String>,
 }
+
+/*
+  Book
+*/
+
+/*
+  BookNode
+*/
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct GetBookNode {
+    pub _id: ObjectId,
+    pub title: String,
+    pub body: String,
+    pub metadata: String,
+    pub image_url: Option<String>,
+    pub book_id: ObjectId,
+    pub identity: i32,
+    pub parent_id: Option<ObjectId>
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct DeleteBookNode {
+    pub _id: ObjectId
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct AddBookNode {
+    pub title: String,
+    pub body: String,
+    pub metadata: String,
+    pub image_url: Option<String>,
+    pub book_id: String,
+    pub identity: i32,
+    pub parent_id: Option<ObjectId>
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct UpdateBookNode {
+  pub title: Option<String>,
+  pub body: Option<String>,
+  pub metadata: Option<String>,
+}
+
+/*
+  BookNode
+*/
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct NewCollection {

@@ -1,9 +1,10 @@
-use crate::{model::{Book, AddBook, UpdateBook}, error::HttpErrorResponse};
+use crate::{model::{GetBook, DeleteBook, AddBook, UpdateBook}, error::HttpErrorResponse};
 
 use actix_web::{web, HttpResponse};
 use mongodb::{bson::{doc, oid::ObjectId}, Client, Collection};
 use actix_session::Session;
 use serde::{Serialize, Deserialize};
+use futures::stream::TryStreamExt;
 
 const DB_NAME: &str = "sankar";
 const COLL_NAME: &str = "books";
@@ -35,12 +36,22 @@ pub async fn add_book(client: web::Data<Client>, form: web::Json<AddBook>, sessi
     Ok(HttpResponse::Ok().json(result))
 }
 
+pub async fn get_all_books(client: web::Data<Client>) -> Result<HttpResponse, HttpErrorResponse> {
+    let collection: Collection<GetBook> = client.database(DB_NAME).collection(COLL_NAME);
+    let mut cursor = collection.find(None, None).await?;
+    let mut books = Vec::new();
+    while let Some(book) = cursor.try_next().await? {
+        books.push(book);
+    }
+    Ok(HttpResponse::Ok().json(books))
+}
+
 pub async fn get_book(client: web::Data<Client>, book_id: web::Path<String>) -> HttpResponse {
     let book_id = match ObjectId::parse_str(book_id.as_str()) {
         Ok(d) => d,
         Err(e) => return HttpResponse::InternalServerError().body(e.to_string()),
     };
-    let collection: Collection<Book> = client.database(DB_NAME).collection(COLL_NAME);
+    let collection: Collection<GetBook> = client.database(DB_NAME).collection(COLL_NAME);
     match collection.find_one(doc! { "_id": &book_id }, None).await {
         Ok(Some(res)) => HttpResponse::Ok().json(res),
         Ok(None) => HttpResponse::NotFound().body(format!("No book found with book_id: {book_id}")),
@@ -54,7 +65,7 @@ pub async fn delete_book(client: web::Data<Client>, book_id: web::Path<String>) 
         Ok(d) => d,
         Err(e) => return Err(HttpErrorResponse::from(e.to_string())),
     };
-    let collection: Collection<Book> = client.database(DB_NAME).collection(COLL_NAME);
+    let collection: Collection<DeleteBook> = client.database(DB_NAME).collection(COLL_NAME);
     match collection.delete_one(doc! { "_id": &book_id }, None).await {
         Ok(res) => Ok(HttpResponse::Ok().json(res)),
         Err(err) => Err(HttpErrorResponse::from(err.to_string())),
