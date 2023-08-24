@@ -20,6 +20,21 @@ pub struct User {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct GetAllUserData {
+  pub _id: ObjectId,
+  pub email: String,
+  pub fname: String,
+  pub lname: String,
+  pub password: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct LoginUser {
+  pub email: String,
+  pub password: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct UpdateUser {
   pub email: Option<String>,
   pub fname: Option<String>,

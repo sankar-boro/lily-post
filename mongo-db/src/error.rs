@@ -1,3 +1,4 @@
+use actix_session::SessionInsertError;
 use serde_json;
 use serde::Serialize;
 
@@ -30,8 +31,26 @@ impl From<anyhow::Error> for HttpErrorResponse {
     }
 }
 
+impl From<SessionInsertError> for HttpErrorResponse {
+    fn from(e: SessionInsertError) -> Self {
+        HttpErrorResponse {
+            status: StatusCode::INTERNAL_SERVER_ERROR,
+            message: e.to_string(),
+        }
+    }
+}
+
 impl From<mongodb::error::Error> for HttpErrorResponse {
     fn from(e: mongodb::error::Error) -> Self {
+        HttpErrorResponse {
+            status: StatusCode::INTERNAL_SERVER_ERROR,
+            message: e.to_string(),
+        }
+    }
+}
+
+impl From<bson::oid::Error> for HttpErrorResponse {
+    fn from(e: bson::oid::Error) -> Self {
         HttpErrorResponse {
             status: StatusCode::INTERNAL_SERVER_ERROR,
             message: e.to_string(),

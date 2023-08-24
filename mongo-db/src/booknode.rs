@@ -2,40 +2,26 @@ use crate::{model::{Book, AddBook, UpdateBook}, error::HttpErrorResponse};
 
 use actix_web::{web, HttpResponse};
 use mongodb::{bson::{doc, oid::ObjectId}, Client, Collection};
-use actix_session::Session;
-use serde::{Serialize, Deserialize};
 
 const DB_NAME: &str = "sankar";
-const COLL_NAME: &str = "books";
+const COLL_NAME: &str = "book_node";
 
-#[derive(Serialize, Deserialize)]
-struct AuthUser {
-  _id: String,
-  fname: String,
-  lname: String,
-}
-
-pub async fn add_book(client: web::Data<Client>, form: web::Json<AddBook>, session: Session) -> Result<HttpResponse, HttpErrorResponse> {
-    let auth_user = session.get::<String>("AUTH_USER").unwrap();
-    let auth_user = match auth_user {
-      Some(a) => a,
-      None => { return Ok(HttpResponse::InternalServerError().json(doc!{"status": 500, "data": "Not auth user"}));}
-    };
-    let auth_user: AuthUser = serde_json::from_str(&auth_user)?;
-
+pub async fn add_book_node(client: web::Data<Client>, form: web::Json<AddBook>) -> HttpResponse {
     let collection = client.database(DB_NAME).collection(COLL_NAME);
     let new_book = doc! { 
         "title": &form.title, 
         "body": &form.body, 
         "metadata": &form.metadata,
         "identity": 101,
-        "user_id": &auth_user._id,
     };
-    let result = collection.insert_one(new_book, None).await?;
-    Ok(HttpResponse::Ok().json(result))
+    let result = collection.insert_one(new_book, None).await;
+    match result {
+        Ok(res) => HttpResponse::Ok().json(res),
+        Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
+    }
 }
 
-pub async fn get_book(client: web::Data<Client>, book_id: web::Path<String>) -> HttpResponse {
+pub async fn get_book_node(client: web::Data<Client>, book_id: web::Path<String>) -> HttpResponse {
     let book_id = match ObjectId::parse_str(book_id.as_str()) {
         Ok(d) => d,
         Err(e) => return HttpResponse::InternalServerError().body(e.to_string()),
@@ -49,7 +35,7 @@ pub async fn get_book(client: web::Data<Client>, book_id: web::Path<String>) -> 
 }
 
 #[allow(dead_code)]
-pub async fn delete_book(client: web::Data<Client>, book_id: web::Path<String>) -> Result<HttpResponse, HttpErrorResponse> {
+pub async fn delete_book_node(client: web::Data<Client>, book_id: web::Path<String>) -> Result<HttpResponse, HttpErrorResponse> {
     let book_id = match ObjectId::parse_str(book_id.as_str()) {
         Ok(d) => d,
         Err(e) => return Err(HttpErrorResponse::from(e.to_string())),
@@ -62,7 +48,7 @@ pub async fn delete_book(client: web::Data<Client>, book_id: web::Path<String>) 
 }
 
 #[allow(dead_code)]
-pub async fn update_book(client: web::Data<Client>, data: web::Json<UpdateBook>, book_id: web::Path<String>) -> Result<HttpResponse, HttpErrorResponse> {
+pub async fn update_book_node(client: web::Data<Client>, data: web::Json<UpdateBook>, book_id: web::Path<String>) -> Result<HttpResponse, HttpErrorResponse> {
     let collection: Collection<UpdateBook> = client.database(DB_NAME).collection(COLL_NAME);
     let book_id = match ObjectId::parse_str(&book_id.as_str()) {
         Ok(d) => d,

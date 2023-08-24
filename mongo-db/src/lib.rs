@@ -5,8 +5,11 @@ pub mod error;
 pub mod model;
 pub mod route;
 pub mod book;
+pub mod booknode;
 
 use mongodb::Client;
+
+pub static AUTH_USER: &str = "AUTH_USER";
 
 pub async fn get_mongo_db_connection() -> Client {
     let uri = std::env::var("MONGODB_URI").unwrap_or_else(|_| "mongodb://localhost:27017".into());
