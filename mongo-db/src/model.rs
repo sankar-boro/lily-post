@@ -72,8 +72,7 @@ pub struct AddBook {
     pub title: String,
     pub body: String,
     pub metadata: String,
-    pub image_url: Option<String>,
-    pub book_id: String,
+    pub image_url: Option<String>
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
@@ -129,6 +128,85 @@ pub struct UpdateBookNode {
   BookNode
 */
 
+
+
+/*
+  Blog
+*/
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct GetBlog {
+    pub _id: ObjectId,
+    pub title: String,
+    pub body: String,
+    pub metadata: String,
+    pub image_url: Option<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct DeleteBlog {
+    pub _id: ObjectId
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct AddBlog {
+    pub title: String,
+    pub body: String,
+    pub metadata: String,
+    pub image_url: Option<String>
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct UpdateBlog {
+  pub title: Option<String>,
+  pub body: Option<String>,
+  pub metadata: Option<String>,
+}
+
+/*
+  Blog
+*/
+
+/*
+  BlogNode
+*/
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct GetBlogNode {
+    pub _id: ObjectId,
+    pub title: String,
+    pub body: String,
+    pub metadata: String,
+    pub image_url: Option<String>,
+    pub blog_id: ObjectId,
+    pub identity: i32,
+    pub parent_id: Option<ObjectId>
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct DeleteBlogNode {
+    pub _id: ObjectId
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct AddBlogNode {
+    pub title: String,
+    pub body: String,
+    pub metadata: String,
+    pub image_url: Option<String>,
+    pub blog_id: String,
+    pub identity: i32,
+    pub parent_id: Option<ObjectId>
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct UpdateBlogNode {
+  pub title: Option<String>,
+  pub body: Option<String>,
+  pub metadata: Option<String>,
+}
+
+/*
+  BlogNode
+*/
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct NewCollection {
     pub name: String,

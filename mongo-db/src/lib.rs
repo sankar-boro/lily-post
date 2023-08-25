@@ -6,6 +6,8 @@ pub mod model;
 pub mod route;
 pub mod book;
 pub mod book_node;
+pub mod blog;
+pub mod blog_node;
 
 use mongodb::Client;
 

@@ -38,7 +38,7 @@ pub async fn login(client: web::Data<Client>, form: web::Json<LoginUser>, sessio
 
   if e_text.as_str() == get_user.password.as_str() {
       let login_user = doc! {
-            "_id": &get_user._id, 
+            "_id": &get_user._id.to_string(), 
           "email": &get_user.email, 
           "fname": &get_user.fname, 
           "lname": &get_user.lname
@@ -100,7 +100,7 @@ pub async fn user_session(session: Session)
     let auth_user_session = session.get::<String>("AUTH_USER")?;
     match auth_user_session {
         Some(session) => {
-            Ok(HttpResponse::Ok().body(session))
+            Ok(HttpResponse::Ok().json(doc! { "status": 200, "data": session }))
         }
         None => Err(HttpErrorResponse::from("session error".to_string())) 
     }

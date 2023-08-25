@@ -1,4 +1,4 @@
-use crate::{user, book, book_node};
+use crate::{user, book, book_node, blog, blog_node};
 
 use actix_web::web;
 
@@ -29,5 +29,22 @@ pub fn routes(config: &mut web::ServiceConfig) {
     .route("/get/{book_id}", web::get().to(book_node::get_book_node))
     .route("/update/{book_id}", web::post().to(book_node::update_book_node))
     .route("/delete/{book_id}", web::post().to(book_node::delete_book_node))
+  );
+
+  config.route("/blogs", web::get().to(blog::get_all_blogs));
+  config.service(
+    web::scope("/blog")
+    .route("/add_blog", web::post().to(blog::add_blog))
+    .route("/get/{blog_id}", web::get().to(blog::get_blog))
+    .route("/update/{blog_id}", web::post().to(blog::update_blog))
+    .route("/delete/{blog_id}", web::post().to(blog::delete_blog))
+  );
+
+  config.service(
+    web::scope("/blog_node")
+    .route("/add_blog_node", web::post().to(blog_node::add_blog_node))
+    .route("/get/{blog_id}", web::get().to(blog_node::get_blog_node))
+    .route("/update/{blog_id}", web::post().to(blog_node::update_blog_node))
+    .route("/delete/{blog_id}", web::post().to(blog_node::delete_blog_node))
   );
 }
