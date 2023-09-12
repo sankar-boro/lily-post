@@ -11,23 +11,30 @@ members = [
 	"lily-test",
 	"scylla-db",
 	"mongo-db",
+	"pg-db"
 ]
 
 [dependencies]
 
-#actix
+# actix
 actix-web 			= "4.3.1"
 actix-cors 			= "0.6.4"
 actix-service 		= "2.0.2"
 actix-multipart 	= "0.6.0"
 actix-session 		= { version = "0.7.2", features = ["redis-actor-session"] }
 actix-redis 		= "0.12.0"
+
 anyhow 				= "1.0.33"
 env_logger 			= "0.8"
 clap = { version = "4.3.23" , features = [ "derive", "env" ]}
 time 				= "0.3.20"
 
-lily-utils 			= { path = "./lily-utils"}
-mongo_db = { path = "./mongo-db" }
-scylla_db = { path = "./scylla-db" }
 
+# db
+# mongo_db = { path = "./mongo-db" }
+# scylla_db = { path = "./scylla-db" }
+pg_db = { path = "./pg-db" }
+
+# utils
+
+lily-utils 			= { path = "./lily-utils"}

@@ -4,7 +4,7 @@ use std::env;
 use anyhow::Result;
 use actix_cors::Cors;
 use actix_web::middleware::Condition;
-use mongo_db::{get_mongo_db_connection, route};
+use pg_db::{pg_connection, route};
 use actix_web::{web, cookie, App as ActixApp, HttpServer};
 use actix_session::{storage::RedisActorSessionStore, SessionMiddleware, config::PersistentSession};
 use time::Duration;
@@ -54,6 +54,6 @@ async fn main() {
     std::env::set_var("RUST_LOG", "info");
     std::env::set_var("RUST_BACKTRACE", "1");
     env_logger::init();
-    let conn = get_mongo_db_connection().await;
+    let conn = pg_connection().await;
     start_server(conn).await.unwrap();
 }

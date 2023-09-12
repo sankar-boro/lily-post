@@ -2068,8 +2068,7 @@ dependencies = [
  "clap",
  "env_logger",
  "lily-utils",
- "mongo_db",
- "scylla_db",
+ "pg_db",
  "time 0.3.27",
 ]
 
@@ -2582,6 +2581,47 @@ dependencies = [
  "once_cell",
  "pest",
  "sha2",
+]
+
+[[package]]
+name = "pg_db"
+version = "0.1.0"
+dependencies = [
+ "actix-cors",
+ "actix-multipart",
+ "actix-redis",
+ "actix-service",
+ "actix-session",
+ "actix-web",
+ "anyhow",
+ "async-std",
+ "awc",
+ "bigdecimal",
+ "chrono",
+ "config",
+ "deadpool-postgres",
+ "derive_more",
+ "env_logger",
+ "futures",
+ "futures-io",
+ "isahc",
+ "jsonwebtoken",
+ "lazy_static",
+ "lily-utils",
+ "log",
+ "num-bigint 0.3.3",
+ "regex",
+ "rust-argon2",
+ "sanitize-filename",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "time 0.3.27",
+ "tokio-pg-mapper",
+ "tokio-pg-mapper-derive",
+ "tokio-postgres",
+ "uuid 0.8.2",
+ "validator",
 ]
 
 [[package]]
