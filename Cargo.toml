@@ -38,3 +38,4 @@ pg_db = { path = "./pg-db" }
 # utils
 
 lily-utils 			= { path = "./lily-utils"}
+lazy_static = "1.4.0"

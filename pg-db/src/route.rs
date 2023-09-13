@@ -1,8 +1,8 @@
-use actix_web::{web};
 use crate::user;
+use actix_web::web;
 
 pub fn routes(config: &mut web::ServiceConfig) {
-  config.route("/get_user", web::get().to(user::get_user));
+  config.route("/signup", web::get().to(user::signup::signup));
   // config.route("/signup_admin", web::post().to(user::signup_admin));
 
   // user
