@@ -7,7 +7,6 @@ use validator::Validate;
 use crate::error::Error;
 use super::model::{ParentRequest, DeleteBookRequest, UpdateRequest};
 
-
 pub async fn create(
     app: web::Data<Pool>,
     payload: web::Json<ParentRequest>,
@@ -27,10 +26,31 @@ pub async fn create(
     }
 
     let conn = app.get().await.unwrap();
-    let book = conn.query(CREATE_BOOK, &[&auth_id, &payload.title, &payload.body, &image_url, &payload.metadata]).await.unwrap();
+    let book = conn.query(
+        CREATE_BOOK, 
+        &[
+            &auth_id, &payload.title, 
+            &payload.body, &image_url, 
+            &payload.metadata
+        ]
+    ).await.unwrap();
     let bookid: i32 = book[0].get(0);
-    conn.query(CREATE_BOOK_TITLE, &[&bookid, &parentid, &payload.title, &identity]).await.unwrap();
-    conn.query(CREATE_BOOK_NODE, &[&auth_id, &bookid, &parentid, &payload.title, &payload.body, &image_url, &identity, &payload.metadata]).await.unwrap();
+    conn.query(
+        CREATE_BOOK_TITLE, 
+        &[
+            &bookid, &parentid, 
+            &payload.title, &identity
+        ]
+    ).await.unwrap();
+    conn.query(
+        CREATE_BOOK_NODE,
+        &[
+            &auth_id, &bookid, 
+            &parentid, &payload.title, 
+            &payload.body, &image_url, 
+            &identity, &payload.metadata
+        ]
+    ).await.unwrap();
     
     Ok(
         HttpResponse::Ok().json(json!({

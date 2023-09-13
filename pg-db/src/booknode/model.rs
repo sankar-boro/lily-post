@@ -30,3 +30,15 @@ pub struct UpdateRequest {
     pub uid: String,
     pub metadata: String
 }
+
+#[derive(Deserialize, Validate, Serialize, Clone)]
+pub struct GetBook {
+    pub uid: i32,
+    pub authorid: i32,
+    pub bookid: i32,
+    pub parentid: Option<i32>,
+    pub title: String,
+    pub body: String,
+    pub identity: i16,
+    pub metadata: String
+}

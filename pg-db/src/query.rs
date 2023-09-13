@@ -23,6 +23,8 @@ macro_rules! create_query {
 
 /* Book */
 
+pub static BOOK_DATA: &str = "SELECT uid, authorid, bookid, parentid, title, body, identity, metadata FROM booknode WHERE bookid=$1";
+
 pub static CREATE_BOOK: &str = "INSERT INTO book (
     authorid, title, body, imageurl, metadata
 ) VALUES(

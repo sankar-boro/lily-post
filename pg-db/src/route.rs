@@ -17,5 +17,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
     .route("/create", web::post().to(booknode::create))
     .route("/delete", web::post().to(booknode::delete))
     .route("/update", web::post().to(booknode::update))
+    .route("/get_all_nodes/{bookid}", web::get().to(booknode::get_all_nodes))
   );
 }
