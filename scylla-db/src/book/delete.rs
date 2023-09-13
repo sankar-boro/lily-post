@@ -4,7 +4,7 @@ use crate::auth::AuthSession;
 use uuid::Uuid;
 use scylla::batch::Batch;
 use scylla::query::Query;
-use serde::{Deserialize};
+use serde::Deserialize;
 use actix_session::Session;
 use actix_web::{web, HttpResponse};
 

@@ -8,5 +8,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
   config.service(
     web::scope("/book")
     .route("/create", web::post().to(book::create))
+    .route("/delete", web::post().to(book::delete))
+    .route("/update", web::post().to(book::update))
   );
 }

@@ -38,6 +38,8 @@ pub static CREATE_BOOKS: &str = "INSERT INTO sankar.books (
 ) VALUES(
     $1, $2, $3, $4, $5, $6
 )";
+pub static UPDATE_BOOKS: &str = "UPDATE books SET title=$1, body=$2, metadata=$3 WHERE uid=$4";
+
 /**
  * We dont include parentId, because the first node is the parent node.
  */
@@ -47,10 +49,10 @@ pub static CREATE_BOOK: &str = "INSERT INTO books (
     $1, $2, $3, $4, 101, $5
 ) RETURNING uid, createdAt";
 
-pub static CREATE_BOOK_TITLE: &str = "INSERT INTO sankar.book_title (
-    bookId, parentId, uniqueId, title, identity
+pub static CREATE_BOOK_TITLE: &str = "INSERT INTO book_titles (
+    bookId, title, identity
 ) VALUES(
-    $1, $2, $3, $4, $5
+    $1, $2, $3
 )";
 pub static CREATE_USER_BOOKS: &str = "INSERT INTO sankar.userbooks (
     bookId, authorId, title, body, url, metadata, createdAt, updatedAt
