@@ -1,16 +1,15 @@
-use crate::query::{CREATE_BOOK, CREATE_BOOK_TITLE, DELETE_BOOKS, UPDATE_BOOKS, CREATE_BOOK_NODE};
+use crate::query::{CREATE_BOOK_NODE, DELETE_BOOKS, UPDATE_BOOKS, CREATE_BOOK_TITLE};
 use deadpool_postgres::Pool;
 use serde_json::json;
 use actix_session::Session;
 use actix_web::{HttpResponse, web};
 use validator::Validate;
 use crate::error::Error;
-use super::model::{ParentRequest, DeleteBookRequest, UpdateRequest};
-
+use super::model::{CreateNode, DeleteBookRequest, UpdateRequest};
 
 pub async fn create(
     app: web::Data<Pool>,
-    payload: web::Json<ParentRequest>,
+    payload: web::Json<CreateNode>,
     _: Session
 ) 
 -> Result<HttpResponse, Error> 
@@ -18,28 +17,29 @@ pub async fn create(
     payload.validate()?;
     // let auth = session.user_info()?;
     let auth_id: i32 = 1;
-    let identity: i16 = 101;
-    let parentid: Option<i32> = None;
-
+    
     let mut image_url = None;
-    if let Some(imgurl) = &payload.image_url {
+    if let Some(imgurl) = &payload.imageurl {
         image_url = Some(imgurl.to_owned());
     }
 
     let conn = app.get().await.unwrap();
-    let book = conn.query(CREATE_BOOK, &[&auth_id, &payload.title, &payload.body, &image_url, &payload.metadata]).await.unwrap();
-    let bookid: i32 = book[0].get(0);
-    conn.query(CREATE_BOOK_TITLE, &[&bookid, &parentid, &payload.title, &identity]).await.unwrap();
-    conn.query(CREATE_BOOK_NODE, &[&auth_id, &bookid, &parentid, &payload.title, &payload.body, &image_url, &identity, &payload.metadata]).await.unwrap();
+    let books = conn.query(
+        CREATE_BOOK_NODE, 
+        &[&payload.bookid, &payload.parentid, &auth_id, &payload.title, &payload.body, &payload.metadata, &payload.imageurl, &payload.identity]).await.unwrap();
+    let book_id: i32 = books[0].get(0);
+    conn.query(
+        CREATE_BOOK_TITLE, 
+        &[&book_id, &payload.parentid, &payload.title, &payload.identity]).await.unwrap();
     
     Ok(
         HttpResponse::Ok().json(json!({
-            "uid": bookid,
+            "uid": book_id,
             "parentId": null,
             "title": payload.title.clone(),
             "body": payload.body.clone(),
             "url": image_url.clone(),
-            "identity": identity,
+            "identity": &payload.identity,
             "authorId": auth_id,
             "metadata": payload.metadata.clone()
         }))

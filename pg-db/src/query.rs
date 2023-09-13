@@ -21,39 +21,42 @@ macro_rules! create_query {
     };
 }
 
-pub static CREATE_BOOK_NODE_QUERY: &str = "INSERT INTO sankar.book (
-    bookId, pageId, uniqueId, parentId, authorId, title, body, metadata, url, identity
+/* Book */
+
+pub static CREATE_BOOK: &str = "INSERT INTO book (
+    authorid, title, body, imageurl, metadata
 ) VALUES(
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+    $1, $2, $3, $4, $5
+) RETURNING uid";
+
+pub static CREATE_BOOK_TITLE: &str = "INSERT INTO title (
+    bookid, parentid, title, identity
+) VALUES(
+    $1, $2, $3, $4
 )";
 
-pub static CREATE_BLOG_NODE_QUERY: &str = "INSERT INTO sankar.blog (
-    blogId, uniqueId, parentId, authorId, title, body, metadata, url, identity
+pub static CREATE_BOOK_NODE: &str = "INSERT INTO booknode (
+    authorid, bookid, parentid, title, body, imageurl, identity, metadata
 ) VALUES(
-    $1, $2, $3, $4, $5, $6, $7, $8, $9
+    $1, $2, $3, $4, $5, $6, $7, $8
 )";
 
-pub static CREATE_BOOKS: &str = "INSERT INTO sankar.books (
-    bookId, authorId, title, body, url, metadata
+/* Book */
+
+pub static CREATE_BLOG_NODE: &str = "INSERT INTO blognodes (
+    bookid, parentid, authorid, title, body, metadata, imageurl, identity
 ) VALUES(
-    $1, $2, $3, $4, $5, $6
+    $1, $2, $3, $4, $5, $6, $7, $8
 )";
+
+
 pub static UPDATE_BOOKS: &str = "UPDATE books SET title=$1, body=$2, metadata=$3 WHERE uid=$4";
 
 /**
  * We dont include parentId, because the first node is the parent node.
  */
-pub static CREATE_BOOK: &str = "INSERT INTO books (
-    authorId, title, body, imageUrl, identity, metadata
-) VALUES(
-    $1, $2, $3, $4, 101, $5
-) RETURNING uid, createdAt";
 
-pub static CREATE_BOOK_TITLE: &str = "INSERT INTO book_titles (
-    bookId, title, identity
-) VALUES(
-    $1, $2, $3
-)";
+
 pub static CREATE_USER_BOOKS: &str = "INSERT INTO sankar.userbooks (
     bookId, authorId, title, body, url, metadata, createdAt, updatedAt
 ) VALUES(

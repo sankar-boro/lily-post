@@ -8,6 +8,7 @@ mod error;
 mod user;
 mod auth;
 mod book;
+mod booknode;
 mod query;
 
 pub mod route;
