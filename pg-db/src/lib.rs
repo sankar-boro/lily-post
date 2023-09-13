@@ -3,13 +3,15 @@
 #[macro_use]
 extern crate lazy_static;
 
-mod connection;
-mod error;
 mod user;
 mod auth;
 mod book;
-mod booknode;
+mod blog;
 mod query;
+mod error;
+mod booknode;
+mod blognode;
+mod connection;
 
 pub mod route;
 pub use connection::pg_connection;

@@ -56,3 +56,34 @@ CREATE TABLE booknode (
   	updatedat TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 ```
+
+
+
+### Create Blogs table
+
+```sql
+CREATE TABLE blog (
+	uid serial PRIMARY KEY,
+  	authorid INT NOT NULL,
+	title TEXT NOT NULL,
+	body TEXT NOT NULL,
+  	imageurl TEXT,
+  	metadata TEXT NOT NULL,
+	createdat TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  	updatedat TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE blognode (
+	uid serial PRIMARY KEY,
+  	authorid INT NOT NULL,
+	blogid INT NOT NULL,
+	parentid INT,
+  	identity SMALLINT NOT NULL,
+	title TEXT NOT NULL,
+	body TEXT NOT NULL,
+  	imageurl TEXT,
+  	metadata TEXT NOT NULL,
+	createdat TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  	updatedat TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+```

@@ -43,16 +43,34 @@ pub static CREATE_BOOK_NODE: &str = "INSERT INTO booknode (
     $1, $2, $3, $4, $5, $6, $7, $8
 )";
 
+pub static UPDATE_BOOKS: &str = "UPDATE books SET title=$1, body=$2, metadata=$3 WHERE uid=$4";
+
+pub static DELETE_BOOKS: &str = "DELETE FROM books where uid=$1";
 /* Book */
 
-pub static CREATE_BLOG_NODE: &str = "INSERT INTO blognodes (
-    bookid, parentid, authorid, title, body, metadata, imageurl, identity
+
+/* Blog */
+
+pub static BLOG_DATA: &str = "SELECT uid, authorid, blogid, parentid, title, body, identity, metadata FROM blognode WHERE blogid=$1";
+
+pub static CREATE_BLOG: &str = "INSERT INTO blog (
+    authorid, title, body, imageurl, metadata
+) VALUES(
+    $1, $2, $3, $4, $5
+) RETURNING uid";
+
+pub static CREATE_BLOG_NODE: &str = "INSERT INTO blognode (
+    authorid, blogid, parentid, title, body, imageurl, identity, metadata
 ) VALUES(
     $1, $2, $3, $4, $5, $6, $7, $8
 )";
 
+pub static UPDATE_BLOGS: &str = "UPDATE blogs SET title=$1, body=$2, metadata=$3 WHERE uid=$4";
 
-pub static UPDATE_BOOKS: &str = "UPDATE books SET title=$1, body=$2, metadata=$3 WHERE uid=$4";
+pub static DELETE_BLOGS: &str = "DELETE FROM blogs where uid=$1";
+
+/* Blog */
+
 
 /**
  * We dont include parentId, because the first node is the parent node.
@@ -80,11 +98,7 @@ pub static CREATE_BLOGS: &str = "INSERT INTO sankar.blogs (
 ) VALUES(
     ?, ?, ?, ?, ?, ?, ?, ?
 )";
-pub static CREATE_BLOG: &str = "INSERT INTO sankar.blog (
-    blogId, uniqueId, authorId, title, body, url, identity, metadata, createdAt, updatedAt
-) VALUES(
-    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-)";
+
 pub static CREATE_USER_BLOGS: &str = "INSERT INTO sankar.userblogs (
     blogId, authorId, title, body, url, metadata, createdAt, updatedAt
 ) VALUES(
@@ -118,7 +132,6 @@ pub static FOLLOW_USER: &str = "INSERT INTO sankar.followers (
 ) IF NOT EXISTS";
 pub static UNFOLLOW_USER: &str = "DELETE FROM sankar.followers WHERE userId=? AND followerId=?";
 
-pub static DELETE_BOOKS: &str = "DELETE FROM books where uid=$1";
 pub static DELETE_USERBOOKS: &str = "DELETE FROM sankar.userbooks where authorId=? AND bookId IN (?)";
 
 pub static SIGNUP: &str = "INSERT INTO users (fname, lname, email, password) VALUES ($1, $2, $3, $4) RETURNING uid";
