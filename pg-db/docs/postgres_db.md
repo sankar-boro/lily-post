@@ -1,0 +1,29 @@
+### Create Users table
+
+```sql
+CREATE TABLE users (
+	uid serial PRIMARY KEY,
+	fname VARCHAR ( 50 ) NOT NULL,
+	lname VARCHAR ( 50 ) NOT NULL,
+	email VARCHAR ( 50 ) UNIQUE NOT NULL,
+	password TEXT NOT NULL,
+	createdat TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updatedat TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### Create Books table
+
+```sql
+CREATE TABLE books (
+	uid serial PRIMARY KEY,
+  authorid INT NOT NULL,
+  identity SMALLINT NOT NULL,
+	title TEXT NOT NULL,
+	body TEXT NOT NULL,
+  imageurl TEXT,
+  metadata TEXT NOT NULL,
+	createdat TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updatedat TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+```
