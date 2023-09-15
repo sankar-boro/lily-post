@@ -40,8 +40,14 @@ pub async fn signup(
     let lname = request.lname.trim();
     let email = request.email.trim();
     
-    let conn = app.get().await.unwrap();
-    let rows = conn.query(SIGNUP, &[&fname, &lname, &email, &password]).await.unwrap();
+    let conn = app.get().await?;
+    let rows = conn.query(
+        SIGNUP, 
+        &[
+            &fname, &lname, 
+            &email, &password
+        ]
+    ).await?;
     let uid: i32 = rows[0].get(0);
 
     Ok(HttpResponse::Ok().json(json!({ "uid": uid, "fname": &fname, "lname": &lname, "email": &email })))

@@ -14,12 +14,12 @@ pub async fn get_all_nodes(
 ) 
 -> Result<HttpResponse, Error> 
 {
-    let blogid: i32 = path.parse().unwrap();
-    let conn = app.get().await.unwrap();
+    let blogid: i32 = path.parse()?;
+    let conn = app.get().await?;
     let blogs = conn.query(
         BLOG_DATA, 
         &[&blogid]
-    ).await.unwrap();
+    ).await?;
 
     let mut allblogs = Vec::new();
     for i in 0..blogs.len() {
@@ -55,7 +55,7 @@ pub async fn create(
         image_url = Some(imgurl.to_owned());
     }
 
-    let conn = app.get().await.unwrap();
+    let conn = app.get().await?;
     conn.query(
         CREATE_BLOG_NODE, 
         &[
@@ -64,7 +64,7 @@ pub async fn create(
             &payload.body, &payload.imageurl, 
             &payload.identity, &payload.metadata
         ]
-    ).await.unwrap();
+    ).await?;
     
     Ok(
         HttpResponse::Ok().json(json!({
@@ -85,8 +85,8 @@ pub async fn delete(
     payload: web::Json<DeleteBlogRequest>,
     _: Session
 ) -> Result<HttpResponse, Error> {
-    let conn = app.get().await.unwrap();
-    conn.query(DELETE_BLOGS, &[&payload.uid]).await.unwrap();
+    let conn = app.get().await?;
+    conn.query(DELETE_BLOGS, &[&payload.uid]).await?;
 
     Ok(HttpResponse::Ok().body("Deleted blog."))
 }
@@ -97,14 +97,14 @@ pub async fn update(
     _: Session
 ) -> Result<HttpResponse, Error> {
     
-    let conn = app.get().await.unwrap();
+    let conn = app.get().await?;
     conn.query(
         UPDATE_BLOGS, 
         &[
             &payload.uid, &payload.title, 
             &payload.body, &payload.metadata
         ]
-    ).await.unwrap();
+    ).await?;
 
     Ok(HttpResponse::Ok().json(json!({
         "uid": &payload.uid,

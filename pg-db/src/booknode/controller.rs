@@ -14,12 +14,12 @@ pub async fn get_all_nodes(
 ) 
 -> Result<HttpResponse, Error> 
 {
-    let bookid: i32 = path.parse().unwrap();
-    let conn = app.get().await.unwrap();
+    let bookid: i32 = path.parse()?;
+    let conn = app.get().await?;
     let books = conn.query(
         BOOK_DATA, 
         &[&bookid]
-    ).await.unwrap();
+    ).await?;
 
     let mut allbooks = Vec::new();
     for i in 0..books.len() {
@@ -55,14 +55,14 @@ pub async fn create(
         image_url = Some(imgurl.to_owned());
     }
 
-    let conn = app.get().await.unwrap();
+    let conn = app.get().await?;
     conn.query(
         CREATE_BOOK_TITLE, 
         &[
             &payload.bookid, &payload.parentid, 
             &payload.title, &payload.identity
         ]
-    ).await.unwrap();
+    ).await?;
     conn.query(
         CREATE_BOOK_NODE, 
         &[
@@ -71,7 +71,7 @@ pub async fn create(
             &payload.body, &payload.imageurl, 
             &payload.identity, &payload.metadata
         ]
-    ).await.unwrap();
+    ).await?;
     
     Ok(
         HttpResponse::Ok().json(json!({
@@ -92,8 +92,8 @@ pub async fn delete(
     payload: web::Json<DeleteBookRequest>,
     _: Session
 ) -> Result<HttpResponse, Error> {
-    let conn = app.get().await.unwrap();
-    conn.query(DELETE_BOOKS, &[&payload.uid]).await.unwrap();
+    let conn = app.get().await?;
+    conn.query(DELETE_BOOKS, &[&payload.uid]).await?;
 
     Ok(HttpResponse::Ok().body("Deleted book."))
 }
@@ -104,8 +104,8 @@ pub async fn update(
     _: Session
 ) -> Result<HttpResponse, Error> {
     
-    let conn = app.get().await.unwrap();
-    conn.query(UPDATE_BOOKS, &[&payload.uid, &payload.title, &payload.body, &payload.metadata]).await.unwrap();
+    let conn = app.get().await?;
+    conn.query(UPDATE_BOOKS, &[&payload.uid, &payload.title, &payload.body, &payload.metadata]).await?;
 
     Ok(HttpResponse::Ok().json(json!({
         "uid": &payload.uid,

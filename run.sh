@@ -9,7 +9,7 @@ DB_URI="127.0.0.1:9042" \
 INDEXER_URI="http://localhost:7700" \
 LP_HOST=localhost \
 DEV=TRUE \
-LP_PORT=2023 \
-./target/release/lily_post
+LP_PORT=2024 \
+RUST_LOG=info ./target/release/lily_post
 
 # sudo lsof -i -P -n | grep LISTEN 

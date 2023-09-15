@@ -2069,6 +2069,7 @@ dependencies = [
  "env_logger",
  "lazy_static",
  "lily-utils",
+ "log",
  "pg_db",
  "time 0.3.27",
 ]

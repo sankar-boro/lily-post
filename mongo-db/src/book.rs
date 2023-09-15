@@ -17,7 +17,7 @@ struct AuthUser {
 }
 
 pub async fn add_book(client: web::Data<Client>, form: web::Json<AddBook>, session: Session) -> Result<HttpResponse, HttpErrorResponse> {
-    let auth_user = session.get::<String>("AUTH_USER").unwrap();
+    let auth_user = session.get::<String>("AUTH_USER")?;
     let auth_user = match auth_user {
       Some(a) => a,
       None => { return Ok(HttpResponse::InternalServerError().json(doc!{"status": 500, "data": "Not auth user"}));}

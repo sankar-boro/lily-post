@@ -25,7 +25,7 @@ pub async fn create(
         image_url = Some(imgurl.to_owned());
     }
 
-    let conn = app.get().await.unwrap();
+    let conn = app.get().await?;
     let book = conn.query(
         CREATE_BOOK, 
         &[
@@ -33,7 +33,7 @@ pub async fn create(
             &payload.body, &image_url, 
             &payload.metadata
         ]
-    ).await.unwrap();
+    ).await?;
     let bookid: i32 = book[0].get(0);
     conn.query(
         CREATE_BOOK_TITLE, 
@@ -41,7 +41,7 @@ pub async fn create(
             &bookid, &parentid, 
             &payload.title, &identity
         ]
-    ).await.unwrap();
+    ).await?;
     conn.query(
         CREATE_BOOK_NODE,
         &[
@@ -50,7 +50,7 @@ pub async fn create(
             &payload.body, &image_url, 
             &identity, &payload.metadata
         ]
-    ).await.unwrap();
+    ).await?;
     
     Ok(
         HttpResponse::Ok().json(json!({
@@ -71,8 +71,8 @@ pub async fn delete(
     payload: web::Json<DeleteBookRequest>,
     _: Session
 ) -> Result<HttpResponse, Error> {
-    let conn = app.get().await.unwrap();
-    conn.query(DELETE_BOOKS, &[&payload.uid]).await.unwrap();
+    let conn = app.get().await?;
+    conn.query(DELETE_BOOKS, &[&payload.uid]).await?;
 
     Ok(HttpResponse::Ok().body("Deleted book."))
 }
@@ -83,8 +83,8 @@ pub async fn update(
     _: Session
 ) -> Result<HttpResponse, Error> {
     
-    let conn = app.get().await.unwrap();
-    conn.query(UPDATE_BOOKS, &[&payload.uid, &payload.title, &payload.body, &payload.metadata]).await.unwrap();
+    let conn = app.get().await?;
+    conn.query(UPDATE_BOOKS, &[&payload.uid, &payload.title, &payload.body, &payload.metadata]).await?;
 
     Ok(HttpResponse::Ok().json(json!({
         "uid": &payload.uid,

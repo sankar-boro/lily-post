@@ -1,9 +1,9 @@
 use argon2;
 use serde_json;
-use serde::{Serialize};
+use serde::Serialize;
 
 use actix_web::{
-    http::{StatusCode},
+    http::StatusCode,
     HttpResponse,
 };
 use derive_more::Display;
