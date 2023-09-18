@@ -29,7 +29,8 @@ pub struct DeleteBookRequest {
 pub struct UpdateRequest {
     pub title: String,
     pub body: String,
-    pub uid: String,
+    pub uid: i32,
+    pub docid: i32,
     pub metadata: String
 }
 
