@@ -56,3 +56,15 @@ pub struct GetBookNodesForPage {
     pub identity: i16,
     pub metadata: String
 }
+
+#[derive(Deserialize)]
+pub struct UpdateNode {
+    pub tuid: i32,
+    pub buid: i32,
+}
+#[derive(Deserialize)]
+pub struct DeleteNode {
+    pub docid: i32,
+    pub nodes: Vec<i32>,
+    pub update: Option<UpdateNode>,
+}
