@@ -46,6 +46,7 @@ CREATE TABLE booknode (
 	uid serial PRIMARY KEY,
   	authorid INT NOT NULL,
 	bookid INT NOT NULL,
+	pageid INT NOT NULL,
 	parentid INT,
   	identity SMALLINT NOT NULL,
 	title TEXT NOT NULL,
@@ -55,6 +56,13 @@ CREATE TABLE booknode (
 	createdat TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   	updatedat TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX booknodeidx ON booknode (bookid, pageid);
+
+DROP TABLE book;
+DROP TABLE title;
+DROP TABLE booknode;
+
 ```
 
 
