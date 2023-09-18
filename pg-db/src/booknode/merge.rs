@@ -13,10 +13,13 @@ pub static CREATE_BOOK_TITLE: &str = "INSERT INTO title (
     $1, $2, $3, $4
 ) RETURNING uid, identity";
 pub static CREATE_BOOK_NODE: &str = "INSERT INTO booknode (
-    authorid, bookid, pageid, parentid, title, body, imageurl, identity, metadata
+    uid, authorid, bookid, pageid, parentid, title, body, imageurl, identity, metadata
 ) VALUES(
-    $1, $2, $3, $4, $5, $6, $7, $8, $9
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
 )";
+pub static UPDATE_TITLE: &str = "UPDATE title SET parentid=$1 WHERE uid=$2";
+pub static UPDATE_BOOKNODE: &str = "UPDATE booknode SET parentid=$1 WHERE uid=$2";
+
 pub async fn merge(
     app: web::Data<Pool>,
     payload: web::Json<CreateNode>,
@@ -34,6 +37,7 @@ pub async fn merge(
     }
 
     let conn = app.get().await?;
+
     let row = conn.query(
         CREATE_BOOK_TITLE, 
         &[
@@ -41,8 +45,9 @@ pub async fn merge(
             &payload.title, &payload.identity
         ]
     ).await?;
-
-    let row_id: i32 = match payload.pageid {
+    let row_id: i32 = row[0].get(0);
+    
+    let pageid: i32 = match payload.pageid {
         Some(row_id) => row_id,
         None => { let xid: i32 = row[0].get(0); xid }
     };
@@ -50,13 +55,23 @@ pub async fn merge(
     conn.query(
         CREATE_BOOK_NODE, 
         &[
-            &auth_id, &payload.docid, &row_id, 
+            &row_id, &auth_id, &payload.docid, &pageid, 
             &payload.tuid, &payload.title, 
             &payload.body, &payload.imageurl, 
             &payload.identity, &payload.metadata
         ]
     ).await?;
     
+    conn.query(
+        UPDATE_TITLE, 
+        &[&row_id, &payload.buid]
+    ).await?;
+
+    conn.query(
+        UPDATE_BOOKNODE, 
+        &[&row_id, &payload.buid]
+    ).await?;
+
     Ok(
         HttpResponse::Ok().json(json!({
             "uid": payload.docid,

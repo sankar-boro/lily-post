@@ -18,6 +18,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
     .route("/delete", web::post().to(booknode::delete))
     .route("/update", web::post().to(booknode::update))
     .route("/append", web::post().to(booknode::create))
+    .route("/merge", web::post().to(booknode::merge))
   );
 
   config.service(
