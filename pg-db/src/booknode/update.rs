@@ -16,7 +16,9 @@ pub async fn update(
 ) -> Result<HttpResponse, Error> {
   
   let conn = app.get().await?;
-  conn.query(UPDATE_BOOK, &[&payload.title, &payload.body, &payload.metadata, &payload.docid]).await?;
+  if payload.identity == 101 {
+    conn.query(UPDATE_BOOK, &[&payload.title, &payload.body, &payload.metadata, &payload.docid]).await?;
+  }
   conn.query(UPDATE_BOOKNODE, &[&payload.title, &payload.body, &payload.metadata, &payload.uid]).await?;
   conn.query(UPDATE_TITLE, &[&payload.title, &payload.uid]).await?;
 

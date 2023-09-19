@@ -31,7 +31,8 @@ pub struct UpdateRequest {
     pub body: String,
     pub uid: i32,
     pub docid: i32,
-    pub metadata: String
+    pub metadata: String,
+    pub identity: i16,
 }
 
 #[derive(Deserialize, Validate, Serialize, Clone)]

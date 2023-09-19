@@ -20,10 +20,11 @@ pub static CREATE_BOOK_TITLE: &str = "INSERT INTO title (
 ) RETURNING uid";
 
 pub static CREATE_BOOK_NODE: &str = "INSERT INTO booknode (
-    authorid, bookid, pageid, parentid, title, body, imageurl, identity, metadata
+    uid, authorid, bookid, pageid, parentid, title, body, imageurl, identity, metadata
 ) VALUES(
-    $1, $2, $3, $4, $5, $6, $7, $8, $9
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
 )";
+
 pub async fn create(
     app: web::Data<Pool>,
     payload: web::Json<ParentRequest>,
@@ -43,7 +44,7 @@ pub async fn create(
     }
 
     let conn = app.get().await?;
-    let book = conn.query(
+    let doc = conn.query(
         CREATE_BOOK, 
         &[
             &auth_id, &payload.title, 
@@ -51,19 +52,21 @@ pub async fn create(
             &payload.metadata
         ]
     ).await?;
-    let bookid: i32 = book[0].get(0);
-    let pageid: i32 = bookid;
-    conn.query(
+    let docid: i32 = doc[0].get(0);
+    
+    let title = conn.query(
         CREATE_BOOK_TITLE, 
         &[
-            &bookid, &parentid, 
+            &docid, &parentid, 
             &payload.title, &identity
         ]
     ).await?;
+    let nodeid: i32 = title[0].get(0);
+
     conn.query(
         CREATE_BOOK_NODE,
         &[
-            &auth_id, &bookid, &pageid,
+            &nodeid, &auth_id, &docid, &nodeid,
             &parentid, &payload.title, 
             &payload.body, &image_url, 
             &identity, &payload.metadata
@@ -72,9 +75,9 @@ pub async fn create(
     
     Ok(
         HttpResponse::Ok().json(json!({
-            "uid": bookid,
-            "bookid": bookid,
-            "pageid": pageid,
+            "uid": docid,
+            "bookid": docid,
+            "pageid": nodeid,
             "parentId": null,
             "title": payload.title.clone(),
             "body": payload.body.clone(),
@@ -95,21 +98,4 @@ pub async fn delete(
     conn.query(DELETE_BOOKS, &[&payload.uid]).await?;
 
     Ok(HttpResponse::Ok().body("Deleted book."))
-}
-
-pub async fn update(
-    app: web::Data<Pool>,
-    payload: web::Json<UpdateRequest>,
-    _: Session
-) -> Result<HttpResponse, Error> {
-    
-    let conn = app.get().await?;
-    conn.query(UPDATE_BOOKS, &[&payload.uid, &payload.title, &payload.body, &payload.metadata]).await?;
-
-    Ok(HttpResponse::Ok().json(json!({
-        "uid": &payload.uid,
-        "title": &payload.title,
-        "body": &payload.body,
-        "metadata": &payload.metadata
-    })))
 }
