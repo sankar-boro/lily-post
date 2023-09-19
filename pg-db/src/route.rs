@@ -32,6 +32,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
     .route("/create", web::post().to(blognode::create))
     .route("/delete", web::post().to(blognode::delete))
     .route("/update", web::post().to(blognode::update))
-    .route("/get_all_nodes/{docid}", web::get().to(blognode::get_all_nodes))
+    .route("/append", web::post().to(blognode::create))
+    .route("/merge", web::post().to(blognode::merge))
   );
 }
