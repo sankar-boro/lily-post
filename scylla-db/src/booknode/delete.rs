@@ -7,7 +7,7 @@ use scylla::batch::Batch;
 
 #[derive(Deserialize)]
 pub struct DeleteBookNodeRequest {
-    bookId: String,
+    docid: String,
     pageId: String,
     bookNodes: Vec<String>,
     titleNodes: Vec<String>,
@@ -17,7 +17,7 @@ pub async fn delete(
     app: web::Data<Connections>, 
     payload: web::Json<DeleteBookNodeRequest>
 ) -> Result<HttpResponse, crate::AppError> {
-    let book_id = Uuid::parse_str(&payload.bookId)?;
+    let book_id = Uuid::parse_str(&payload.docid)?;
     let page_id = Uuid::parse_str(&payload.pageId)?;
 
     let book_nodes = &payload.bookNodes;
@@ -40,8 +40,8 @@ pub async fn delete(
         titleNodeIds.push_str(&format!(", {}", &id));
     }
 
-    let query_book = Query::new(format!("DELETE FROM sankar.book WHERE bookId={} AND pageId={} AND uniqueId IN ({})", &book_id, &page_id, &bookNodesIds));
-    let query_title = Query::new(format!("DELETE FROM sankar.book_title WHERE bookId={} AND uniqueId IN ({})", &book_id, &titleNodeIds));
+    let query_book = Query::new(format!("DELETE FROM sankar.book WHERE docid={} AND pageId={} AND uniqueId IN ({})", &book_id, &page_id, &bookNodesIds));
+    let query_title = Query::new(format!("DELETE FROM sankar.book_title WHERE docid={} AND uniqueId IN ({})", &book_id, &titleNodeIds));
 
     let mut batch: Batch = Default::default();
     batch.append_statement(query_book);

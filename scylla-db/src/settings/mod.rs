@@ -12,7 +12,7 @@ use crate::utils::ParseUuid;
 
 #[derive(Deserialize, Validate, FromRow)]
 pub struct ParentRequest {
-    bookId: String,
+    docid: String,
     settings: String,
 }
 
@@ -25,7 +25,7 @@ pub async fn create(
 {
     let auth = session.user_info()?;
     // let author_id = Uuid::parse_str(&auth.userId)?;
-    let book_id = &request.bookId.to_uuid()?;
+    let book_id = &request.docid.to_uuid()?;
 
     let create_data = ( 
         auth.userId,
@@ -45,7 +45,7 @@ pub async fn update(
 {
     let auth = session.user_info()?;
     // let author_id = Uuid::parse_str(&auth.userId)?;
-    let book_id = &request.bookId.to_uuid()?;
+    let book_id = &request.docid.to_uuid()?;
 
     let create_data = ( 
         &request.settings,

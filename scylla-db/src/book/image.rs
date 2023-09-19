@@ -10,7 +10,7 @@ use crate::auth::AuthSession;
 
 #[derive(Deserialize, Serialize, Clone)]
 pub struct UpdateBookImage {
-    bookId: String,
+    docid: String,
     uniqueId: String,
     pageId: String,
     category: String,
@@ -27,15 +27,15 @@ pub async fn update_image(
 {   
     let auth = session.user_info()?;
     // let auth_id = Uuid::parse_str(&auth.userId)?;
-    let bookId = Uuid::parse_str(&payload.bookId)?;
+    let docid = Uuid::parse_str(&payload.docid)?;
     let uniqueId = Uuid::parse_str(&payload.uniqueId)?;
     let pageId = Uuid::parse_str(&payload.pageId)?;
     let created_at = Uuid::parse_str(&payload.createdAt)?;
 
-    let bookQuery = Query::from(format!("UPDATE sankar.book SET url=? WHERE bookId=? AND pageId=? AND uniqueId=?"));
-    let booksQuery = Query::from(format!("UPDATE sankar.books SET url=? WHERE bookId=? AND createdAt=?"));
-    let userBooksQuery = Query::from(format!("UPDATE sankar.userbooks SET url=? WHERE authorId=? AND bookId=?"));
-    let categoryBooksQuery = Query::from(format!("UPDATE sankar.categorybooks SET url=? WHERE category=? AND bookId=?"));
+    let bookQuery = Query::from(format!("UPDATE sankar.book SET url=? WHERE docid=? AND pageId=? AND uniqueId=?"));
+    let booksQuery = Query::from(format!("UPDATE sankar.books SET url=? WHERE docid=? AND createdAt=?"));
+    let userBooksQuery = Query::from(format!("UPDATE sankar.userbooks SET url=? WHERE authorId=? AND docid=?"));
+    let categoryBooksQuery = Query::from(format!("UPDATE sankar.categorybooks SET url=? WHERE category=? AND docid=?"));
     
     let mut batch: Batch = Default::default();
     batch.append_statement(bookQuery);
@@ -43,10 +43,10 @@ pub async fn update_image(
     batch.append_statement(userBooksQuery);
     batch.append_statement(categoryBooksQuery);
     app.batch(&batch, (
-        (&payload.image_url, &bookId, &pageId, &uniqueId), // book
-        (&payload.image_url, &bookId, &created_at), // books
-        (&payload.image_url, auth.userId, &bookId), // userbooks
-        (&payload.image_url, &payload.category, &bookId), // categorybooks
+        (&payload.image_url, &docid, &pageId, &uniqueId), // book
+        (&payload.image_url, &docid, &created_at), // books
+        (&payload.image_url, auth.userId, &docid), // userbooks
+        (&payload.image_url, &payload.category, &docid), // categorybooks
     )).await?;
 
     Ok(HttpResponse::Ok().json(payload))

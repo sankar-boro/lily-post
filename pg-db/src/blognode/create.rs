@@ -7,16 +7,12 @@ use crate::error::Error;
 use super::model::CreateNode;
 
 
-pub static CREATE_BOOK_TITLE: &str = "INSERT INTO title (
-    docid, parentid, title, identity
+pub static CREATE_BLOG_NODE: &str = "INSERT INTO blognode (
+    authorid, docid, parentid, title, body, imageurl, identity, metadata
 ) VALUES(
-    $1, $2, $3, $4
-) RETURNING uid, identity";
-pub static CREATE_BOOK_NODE: &str = "INSERT INTO booknode (
-    uid, authorid, docid, pageid, parentid, title, body, imageurl, identity, metadata
-) VALUES(
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+    $1, $2, $3, $4, $5, $6, $7, $8
 )";
+
 pub async fn create(
     app: web::Data<Pool>,
     payload: web::Json<CreateNode>,
@@ -34,25 +30,10 @@ pub async fn create(
     }
 
     let conn = app.get().await?;
-
-    let row = conn.query(
-        CREATE_BOOK_TITLE, 
-        &[
-            &payload.docid, &payload.tuid, 
-            &payload.title, &payload.identity
-        ]
-    ).await?;
-    let row_id: i32 = row[0].get(0);
-    
-    let pageid: i32 = match payload.pageid {
-        Some(row_id) => row_id,
-        None => { let xid: i32 = row[0].get(0); xid }
-    };
-    
     conn.query(
-        CREATE_BOOK_NODE, 
+        CREATE_BLOG_NODE, 
         &[
-            &row_id, &auth_id, &payload.docid, &pageid, 
+            &auth_id, &payload.docid, 
             &payload.tuid, &payload.title, 
             &payload.body, &payload.imageurl, 
             &payload.identity, &payload.metadata
@@ -61,8 +42,7 @@ pub async fn create(
     
     Ok(
         HttpResponse::Ok().json(json!({
-            "uid": &row_id,
-            "pageid": &pageid,
+            "uid": payload.docid,
             "parentid": payload.tuid,
             "title": payload.title.clone(),
             "body": payload.body.clone(),

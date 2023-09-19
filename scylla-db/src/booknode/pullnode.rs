@@ -11,7 +11,7 @@ use crate::create_query;
 pub struct AppendNodeRequest {
     body: String,
     identity: i16,
-    bookId: String,
+    docid: String,
     parentId: String
 }
 
@@ -21,7 +21,7 @@ pub struct Response {
 }
 
 lazy_static! {
-    static ref QUERY: String = create_query!("sankar.updatebooknode", "bookId", "uniqueId", "parentId", "authorId", "body", "identity", "createdAt", "updatedAt");
+    static ref QUERY: String = create_query!("sankar.updatebooknode", "docid", "uniqueId", "parentId", "authorId", "body", "identity", "createdAt", "updatedAt");
 }
 pub async fn pull_request(
     app: web::Data<Connections>, 
@@ -33,7 +33,7 @@ pub async fn pull_request(
     let new_id = time_uuid();
     let auth = session.user_info()?;
     // let author_id = Uuid::parse_str(&auth.userId)?;
-    let book_id = &payload.bookId.to_uuid()?;
+    let book_id = &payload.docid.to_uuid()?;
     let parent_id = &payload.parentId.to_uuid()?;
 
     let create_data = ( 

@@ -9,7 +9,7 @@ use actix_web::{HttpResponse, web};
 pub struct UpdateRequest {
     title: String,
     body: String,
-    blogId: String,
+    docid: String,
     uniqueId: String,
     metadata: String,
 }
@@ -20,9 +20,9 @@ pub async fn update(
 ) 
 -> Result<HttpResponse, crate::AppError> 
 {   
-    let blogId = Uuid::parse_str(&payload.blogId)?;
+    let docid = Uuid::parse_str(&payload.docid)?;
     let uniqueId = Uuid::parse_str(&payload.uniqueId)?;
-    let query = format!("UPDATE sankar.blog SET title=?, body=?, metadata=? WHERE blogId=? AND uniqueId=?");
-    app.query(query, (&payload.title, &payload.body, &payload.metadata, &blogId, &uniqueId)).await?;
+    let query = format!("UPDATE sankar.blog SET title=?, body=?, metadata=? WHERE docid=? AND uniqueId=?");
+    app.query(query, (&payload.title, &payload.body, &payload.metadata, &docid, &uniqueId)).await?;
     Ok(HttpResponse::Ok().body("Updated".to_string()))
 }

@@ -13,7 +13,7 @@ struct UpdateData {
 
 #[derive(Deserialize)]
 pub struct UpdateOrDelete {
-    bookId: String,
+    docid: String,
     pageId: String,
     updateData: UpdateData,
     bookNodes: Vec<String>,
@@ -26,14 +26,14 @@ pub async fn deleteAndUpdate(
 ) -> Result<HttpResponse, crate::AppError> {
 
     let update_data = &payload.updateData;
-    let book_id = Uuid::parse_str(&payload.bookId)?;
+    let book_id = Uuid::parse_str(&payload.docid)?;
     let page_id = Uuid::parse_str(&payload.pageId)?;
 
     let mut batch: Batch = Default::default();
 
     // update query
     let update_query = Query::new(
-        format!("UPDATE sankar.book SET parentId={} WHERE bookId={} AND pageId={} AND uniqueId={}", 
+        format!("UPDATE sankar.book SET parentId={} WHERE docid={} AND pageId={} AND uniqueId={}", 
         &update_data.topUniqueId, 
         &book_id,
         &page_id, 
@@ -43,7 +43,7 @@ pub async fn deleteAndUpdate(
 
      // update query
      let update_title_query = Query::new(
-        format!("UPDATE sankar.book_title SET parentId={} WHERE bookId={} AND uniqueId={}", 
+        format!("UPDATE sankar.book_title SET parentId={} WHERE docid={} AND uniqueId={}", 
         &update_data.topUniqueId, 
         &book_id,
         &update_data.botUniqueId)
@@ -61,7 +61,7 @@ pub async fn deleteAndUpdate(
         book_node_ids.push_str(&format!(", {}", &id));
     }
     let delete_nodes_query = Query::new(format!(
-        "DELETE FROM sankar.book WHERE bookId={} AND pageId={} AND uniqueId IN ({})",
+        "DELETE FROM sankar.book WHERE docid={} AND pageId={} AND uniqueId IN ({})",
         &book_id,
         &page_id,
         &book_node_ids)
@@ -79,7 +79,7 @@ pub async fn deleteAndUpdate(
         title_node_ids.push_str(&format!(", {}", &id));
     }
     let delete_title_query = Query::new(format!(
-        "DELETE FROM sankar.book_title WHERE bookId={} AND uniqueId IN ({})",
+        "DELETE FROM sankar.book_title WHERE docid={} AND uniqueId IN ({})",
         &book_id,
         &title_node_ids)
     );

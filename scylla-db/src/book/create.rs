@@ -95,7 +95,7 @@ pub async fn create(
 
     Ok(
         HttpResponse::Ok().json(json!({
-            "bookId": timeuidstr.clone(),
+            "docid": timeuidstr.clone(),
             "pageId": timeuidstr.clone(),
             "uniqueId": timeuidstr.clone(),
             "parentId": null,

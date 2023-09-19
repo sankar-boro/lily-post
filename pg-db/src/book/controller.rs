@@ -14,13 +14,13 @@ pub static CREATE_BOOK: &str = "INSERT INTO book (
 ) RETURNING uid";
 
 pub static CREATE_BOOK_TITLE: &str = "INSERT INTO title (
-    bookid, parentid, title, identity
+    docid, parentid, title, identity
 ) VALUES(
     $1, $2, $3, $4
 ) RETURNING uid";
 
 pub static CREATE_BOOK_NODE: &str = "INSERT INTO booknode (
-    uid, authorid, bookid, pageid, parentid, title, body, imageurl, identity, metadata
+    uid, authorid, docid, pageid, parentid, title, body, imageurl, identity, metadata
 ) VALUES(
     $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
 )";
@@ -76,7 +76,7 @@ pub async fn create(
     Ok(
         HttpResponse::Ok().json(json!({
             "uid": docid,
-            "bookid": docid,
+            "docid": docid,
             "pageid": nodeid,
             "parentId": null,
             "title": payload.title.clone(),

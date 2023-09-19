@@ -34,11 +34,11 @@ pub async fn create(
             &payload.metadata
         ]
     ).await?;
-    let blogid: i32 = blog[0].get(0);
+    let docid: i32 = blog[0].get(0);
     conn.query(
         CREATE_BLOG_NODE,
         &[
-            &auth_id, &blogid, 
+            &auth_id, &docid, 
             &parentid, &payload.title, 
             &payload.body, &image_url, 
             &identity, &payload.metadata
@@ -47,7 +47,7 @@ pub async fn create(
     
     Ok(
         HttpResponse::Ok().json(json!({
-            "uid": blogid,
+            "uid": docid,
             "parentId": null,
             "title": payload.title.clone(),
             "body": payload.body.clone(),

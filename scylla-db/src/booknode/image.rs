@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 #[derive(Deserialize, Serialize, Clone)]
 pub struct UpdateNodeRequest {
-    bookId: String,
+    docid: String,
     uniqueId: String,
     pageId: String,
     image_url: String,
@@ -17,11 +17,11 @@ pub async fn update_image(
 ) 
 -> Result<HttpResponse, crate::AppError> 
 {   
-    let bookId = Uuid::parse_str(&payload.bookId)?;
+    let docid = Uuid::parse_str(&payload.docid)?;
     let uniqueId = Uuid::parse_str(&payload.uniqueId)?;
     let pageId = Uuid::parse_str(&payload.pageId)?;
 
-    let query = format!("UPDATE sankar.book SET url=? WHERE bookId=? AND pageId=? AND uniqueId=?");
-    app.query(query, (&payload.image_url, &bookId, &pageId, &uniqueId)).await?;
+    let query = format!("UPDATE sankar.book SET url=? WHERE docid=? AND pageId=? AND uniqueId=?");
+    app.query(query, (&payload.image_url, &docid, &pageId, &uniqueId)).await?;
     Ok(HttpResponse::Ok().json(payload))
 }

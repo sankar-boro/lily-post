@@ -8,12 +8,12 @@ use serde::Deserialize;
 use actix_session::Session;
 use actix_web::{web, HttpResponse};
 
-pub static DELETE_BOOKS: &str = "DELETE FROM sankar.books where bookId=?";
-pub static DELETE_USERBOOKS: &str = "DELETE FROM sankar.userbooks where authorId=? AND bookId IN (?)";
+pub static DELETE_BOOKS: &str = "DELETE FROM sankar.books where docid=?";
+pub static DELETE_USERBOOKS: &str = "DELETE FROM sankar.userbooks where authorId=? AND docid IN (?)";
 
 #[derive(Deserialize)]
 pub struct DeleteBookRequest {
-    bookId: String,
+    docid: String,
     deleteData: Vec<String>,
 }
 
@@ -22,7 +22,7 @@ pub async fn delete(
     payload: web::Json<DeleteBookRequest>,
     session: Session
 ) -> Result<HttpResponse, crate::AppError> {
-    let book_id = Uuid::parse_str(&payload.bookId)?;
+    let book_id = Uuid::parse_str(&payload.docid)?;
     let auth = session.user_info()?;
     
     let deleteData = &payload.deleteData;
@@ -37,7 +37,7 @@ pub async fn delete(
 
     let mut batch: Batch = Default::default();
     batch.append_statement(DELETE_BOOKS);
-    let delete_book_query = Query::new(format!("DELETE FROM sankar.book WHERE bookId={} AND pageId IN ({})", &book_id, &pageIds));
+    let delete_book_query = Query::new(format!("DELETE FROM sankar.book WHERE docid={} AND pageId IN ({})", &book_id, &pageIds));
     batch.append_statement(delete_book_query);
     batch.append_statement(DELETE_USERBOOKS);
     

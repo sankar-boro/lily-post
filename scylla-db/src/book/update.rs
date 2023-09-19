@@ -14,7 +14,7 @@ use serde::{Deserialize, Serialize};
 pub struct UpdateRequest {
     title: String,
     body: String,
-    bookId: String,
+    docid: String,
     pageId: String,
     uniqueId: String,
     category: String,
@@ -29,7 +29,7 @@ pub async fn update(
 ) 
 -> Result<HttpResponse, crate::AppError> 
 {   
-    let bookId = Uuid::parse_str(&payload.bookId)?;
+    let docid = Uuid::parse_str(&payload.docid)?;
     let uniqueId = Uuid::parse_str(&payload.uniqueId)?;
     let auth = session.user_info()?;
     // let auth_id = Uuid::parse_str(&auth.userId)?;
@@ -37,20 +37,20 @@ pub async fn update(
     let page_id = Uuid::parse_str(&payload.pageId)?;
 
     let mut batch: Batch = Default::default();
-    let bookQuery = Query::from(format!("UPDATE sankar.book SET title=?, body=?, metadata=? WHERE bookId=? AND pageId=? AND uniqueId=?"));
-    let booksQuery = Query::from(format!("UPDATE sankar.books SET title=?, body=?, metadata=? WHERE bookId=? AND createdAt=?"));
-    let userBooksQuery = Query::from(format!("UPDATE sankar.userbooks SET title=?, body=?, metadata=? WHERE authorId=? AND bookId=?"));
-    let categoryBooksQuery = Query::from(format!("UPDATE sankar.categorybooks SET title=?, body=?, metadata=? WHERE category=? AND bookId=?"));
+    let bookQuery = Query::from(format!("UPDATE sankar.book SET title=?, body=?, metadata=? WHERE docid=? AND pageId=? AND uniqueId=?"));
+    let booksQuery = Query::from(format!("UPDATE sankar.books SET title=?, body=?, metadata=? WHERE docid=? AND createdAt=?"));
+    let userBooksQuery = Query::from(format!("UPDATE sankar.userbooks SET title=?, body=?, metadata=? WHERE authorId=? AND docid=?"));
+    let categoryBooksQuery = Query::from(format!("UPDATE sankar.categorybooks SET title=?, body=?, metadata=? WHERE category=? AND docid=?"));
 
     batch.append_statement(bookQuery);
     batch.append_statement(booksQuery);
     batch.append_statement(userBooksQuery);
     batch.append_statement(categoryBooksQuery);
     app.batch(&batch, (
-        (&payload.title, &payload.body, &payload.metadata, &bookId, &page_id, &uniqueId),
-        (&payload.title, &payload.body, &payload.metadata, &bookId, &created_at),
-        (&payload.title, &payload.body, &payload.metadata, auth.userId, &bookId),
-        (&payload.title, &payload.body, &payload.metadata, &payload.category, &bookId),
+        (&payload.title, &payload.body, &payload.metadata, &docid, &page_id, &uniqueId),
+        (&payload.title, &payload.body, &payload.metadata, &docid, &created_at),
+        (&payload.title, &payload.body, &payload.metadata, auth.userId, &docid),
+        (&payload.title, &payload.body, &payload.metadata, &payload.category, &docid),
     )).await?;
     Ok(HttpResponse::Ok().json(payload.clone()))
 }

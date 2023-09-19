@@ -14,7 +14,7 @@ use actix_session::Session;
 pub struct AppendNodeRequest {
     title: String,
     body: String,
-    blogId: String,
+    docid: String,
     topUniqueId: String,
     metadata: String,
     image_url: Option<String>,
@@ -38,7 +38,7 @@ pub async fn create(
     let identity: i16 = 104;
     let new_id = time_uuid();
     let new__id = new_id.to_string();
-    let blog_id = payload.blogId.to_uuid()?;
+    let blog_id = payload.docid.to_uuid()?;
     let top_unique_id = payload.topUniqueId.to_uuid()?;
     let mut image_url = None;
     if let Some(b) = &payload.image_url {

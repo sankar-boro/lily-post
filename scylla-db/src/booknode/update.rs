@@ -12,7 +12,7 @@ use scylla::query::Query;
 pub struct UpdateRequest {
     title: String,
     body: String,
-    bookId: String,
+    docid: String,
     pageId: String,
     uniqueId: String,
     metadata: String,
@@ -24,20 +24,20 @@ pub async fn update(
 ) 
 -> Result<HttpResponse, crate::AppError> 
 {   
-    let bookId = Uuid::parse_str(&payload.bookId)?;
+    let docid = Uuid::parse_str(&payload.docid)?;
     let uniqueId = Uuid::parse_str(&payload.uniqueId)?;
     let pageId = Uuid::parse_str(&payload.pageId)?;
 
-    let book_query = Query::new(format!("UPDATE sankar.book SET title=?, body=?, metadata=? WHERE bookId=? AND pageId=? AND uniqueId=?"));
-    let title_query = Query::new(format!("UPDATE sankar.book_title SET title=? WHERE bookId=? AND uniqueId=?"));
+    let book_query = Query::new(format!("UPDATE sankar.book SET title=?, body=?, metadata=? WHERE docid=? AND pageId=? AND uniqueId=?"));
+    let title_query = Query::new(format!("UPDATE sankar.book_title SET title=? WHERE docid=? AND uniqueId=?"));
 
     let mut batch: Batch = Default::default();
     batch.append_statement(book_query);
     batch.append_statement(title_query);
 
     app.batch(&batch, (
-        (&payload.title, &payload.body, &payload.metadata, &bookId, &pageId, &uniqueId), 
-        (&payload.title, &bookId, &uniqueId)
+        (&payload.title, &payload.body, &payload.metadata, &docid, &pageId, &uniqueId), 
+        (&payload.title, &docid, &uniqueId)
     )).await?;
 
     

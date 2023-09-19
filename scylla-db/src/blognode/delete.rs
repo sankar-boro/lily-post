@@ -5,7 +5,7 @@ use actix_web::{web, HttpResponse};
 
 #[derive(Deserialize)]
 pub struct DeleteNodeRequest {
-    blogId: String,
+    docid: String,
     blogNodes: Vec<String>,
 }
 
@@ -13,7 +13,7 @@ pub async fn delete(
     app: web::Data<Connections>, 
     payload: web::Json<DeleteNodeRequest>
 ) -> Result<HttpResponse, crate::AppError> {
-    let blog_id = Uuid::parse_str(&payload.blogId)?;
+    let blog_id = Uuid::parse_str(&payload.docid)?;
     let blogNodes = &payload.blogNodes;
     let mut blogNodes = blogNodes.iter();
     
@@ -25,7 +25,7 @@ pub async fn delete(
         uniqueIds.push_str(&format!(", {}", &id));
     }
 
-    let query = format!("DELETE FROM sankar.blog WHERE blogId={} AND uniqueId IN ({})", &blog_id, &uniqueIds);
+    let query = format!("DELETE FROM sankar.blog WHERE docid={} AND uniqueId IN ({})", &blog_id, &uniqueIds);
 
     app.query(query, &[]).await?;
     Ok(HttpResponse::Ok().body("Deleted."))

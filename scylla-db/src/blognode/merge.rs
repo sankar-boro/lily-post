@@ -16,7 +16,7 @@ use serde::{Serialize, Deserialize};
 pub struct MergeNodeRequest {
     title: String,
     body: String,
-    blogId: String,
+    docid: String,
     metadata: String,
     topUniqueId: String,
     botUniqueId: String,
@@ -28,9 +28,9 @@ pub struct Response {
     uniqueId: String,
 }
 
-pub static UPDATE_PARENT_ID: &str = "UPDATE sankar.blog SET parentId=? WHERE blogId=? AND uniqueId=?";
+pub static UPDATE_PARENT_ID: &str = "UPDATE sankar.blog SET parentId=? WHERE docid=? AND uniqueId=?";
 pub static CHILD: &str = "INSERT INTO sankar.blog (
-    blogId, uniqueId, parentId, authorId, title, body, identity, metadata, url, createdAt, updatedAt
+    docid, uniqueId, parentId, authorId, title, body, identity, metadata, url, createdAt, updatedAt
 ) VALUES(
     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 )";
@@ -48,7 +48,7 @@ pub async fn merge(
     // Create and parse elements
     let new_id = time_uuid();
     let new__id = new_id.to_string();
-    let blog_id = Uuid::parse_str(&payload.blogId)?;
+    let blog_id = Uuid::parse_str(&payload.docid)?;
     let top_unique_id = Uuid::parse_str(&payload.topUniqueId)?;
     let bot_unique_id = Uuid::parse_str(&payload.botUniqueId)?;
     let identity: i16 = 104;

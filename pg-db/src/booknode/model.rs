@@ -39,7 +39,7 @@ pub struct UpdateRequest {
 pub struct GetBook {
     pub uid: i32,
     pub authorid: i32,
-    pub bookid: i32,
+    pub docid: i32,
     pub parentid: Option<i32>,
     pub title: String,
     pub body: String,
@@ -50,7 +50,7 @@ pub struct GetBook {
 #[derive(Deserialize, Validate, Serialize, Clone)]
 pub struct GetBookNodesForPage {
     pub uid: i32,
-    pub bookid: i32,
+    pub docid: i32,
     pub pageid: i32,
     pub parentid: Option<i32>,
     pub title: String,

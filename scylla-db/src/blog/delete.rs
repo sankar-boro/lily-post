@@ -8,19 +8,19 @@ use serde::{Deserialize};
 
 #[derive(Deserialize)]
 pub struct DeleteBlogRequest {
-    blogId: String
+    docid: String
 }
 
-pub static DELETE_BLOGS: &str = "DELETE FROM sankar.blogs where blogId=?";
-pub static DELETE_BLOG: &str = "DELETE FROM sankar.blog where blogId=?";
-pub static DELETE_USERBLOGS: &str = "DELETE FROM sankar.userblogs where authorId=? AND blogId IN (?)";
+pub static DELETE_BLOGS: &str = "DELETE FROM sankar.blogs where docid=?";
+pub static DELETE_BLOG: &str = "DELETE FROM sankar.blog where docid=?";
+pub static DELETE_USERBLOGS: &str = "DELETE FROM sankar.userblogs where authorId=? AND docid IN (?)";
 
 pub async fn delete(
     app: web::Data<Connections>,
     payload: web::Json<DeleteBlogRequest>,
     session: Session
 ) -> Result<HttpResponse, crate::AppError> {
-    let blog_id = Uuid::parse_str(&payload.blogId)?;
+    let blog_id = Uuid::parse_str(&payload.docid)?;
     let auth = session.user_info()?;
 
     let mut batch: Batch = Default::default();

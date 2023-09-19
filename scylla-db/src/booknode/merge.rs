@@ -21,7 +21,7 @@ pub struct MergeNodeRequest {
     title: String,
     body: String,
     identity: i16,
-    bookId: String,
+    docid: String,
     pageId: Option<String>,
     metadata: String,
     topUniqueId: String,
@@ -35,13 +35,13 @@ pub struct Response {
     pageId: String,
 }
 
-pub static UPDATE_PARENT_ID: &str = "UPDATE sankar.book SET parentId=? WHERE bookId=? AND pageId=? AND uniqueId=?";
+pub static UPDATE_PARENT_ID: &str = "UPDATE sankar.book SET parentId=? WHERE docid=? AND pageId=? AND uniqueId=?";
 pub static CHILD: &str = "INSERT INTO sankar.book (
-    bookId, pageId, uniqueId, parentId, authorId, title, body, identity, metadata, url, createdAt, updatedAt
+    docid, pageId, uniqueId, parentId, authorId, title, body, identity, metadata, url, createdAt, updatedAt
 ) VALUES(
     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 )";
-pub static UPDATE_PARENT_TITLE: &str = "UPDATE sankar.book_title SET parentId=? WHERE bookId=? AND uniqueId=?";
+pub static UPDATE_PARENT_TITLE: &str = "UPDATE sankar.book_title SET parentId=? WHERE docid=? AND uniqueId=?";
 
 impl MergeNodeRequest {
 
@@ -62,7 +62,7 @@ impl MergeNodeRequest {
         // Create and parse elements
         let new_id = time_uuid();
         let new__id = new_id.to_string();
-        let book_id = Uuid::parse_str(&self.bookId)?;
+        let book_id = Uuid::parse_str(&self.docid)?;
         let top_unique_id = Uuid::parse_str(&self.topUniqueId)?;
         let bot_unique_id = Uuid::parse_str(&self.botUniqueId)?;
 

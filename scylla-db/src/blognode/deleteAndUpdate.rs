@@ -13,7 +13,7 @@ struct UpdateData {
 
 #[derive(Deserialize)]
 pub struct UpdateOrDelete {
-    blogId: String,
+    docid: String,
     updateData: UpdateData,
     blogNodes: Vec<String>,
 }
@@ -24,13 +24,13 @@ pub async fn deleteAndUpdate(
 ) -> Result<HttpResponse, crate::AppError> {
 
     let update_data = &payload.updateData;
-    let blog_id = Uuid::parse_str(&payload.blogId)?;
+    let blog_id = Uuid::parse_str(&payload.docid)?;
 
     let mut batch: Batch = Default::default();
 
     // update query
     let query = Query::new(
-        format!("UPDATE sankar.blog SET parentId={} WHERE blogId={} AND uniqueId={}", 
+        format!("UPDATE sankar.blog SET parentId={} WHERE docid={} AND uniqueId={}", 
         &update_data.topUniqueId, 
         &blog_id, 
         &update_data.botUniqueId)
@@ -48,7 +48,7 @@ pub async fn deleteAndUpdate(
         uniqueIds.push_str(&format!(", {}", &id));
     }
     let query = Query::new(format!(
-        "DELETE FROM sankar.blog WHERE blogId={} AND uniqueId IN ({})",
+        "DELETE FROM sankar.blog WHERE docid={} AND uniqueId IN ({})",
         &blog_id,
         &uniqueIds)
     );

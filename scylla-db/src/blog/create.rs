@@ -75,7 +75,7 @@ pub async fn create(
 
     Ok(
         HttpResponse::Ok().json(json!({
-            "blogId": timeuidstr.clone(),
+            "docid": timeuidstr.clone(),
             "uniqueId": timeuidstr.clone(),
             "parentId": null,
             "title": payload.title.clone(),

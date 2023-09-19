@@ -12,7 +12,7 @@ use crate::auth::AuthSession;
 pub struct UpdateRequest {
     title: String,
     body: String,
-    blogId: String,
+    docid: String,
     uniqueId: String,
     category: String,
     metadata: String,
@@ -25,26 +25,26 @@ pub async fn update(
 ) 
 -> Result<HttpResponse, crate::AppError> 
 {   
-    let blogId = Uuid::parse_str(&payload.blogId)?;
+    let docid = Uuid::parse_str(&payload.docid)?;
     let uniqueId = Uuid::parse_str(&payload.uniqueId)?;
     let auth = session.user_info()?;
     // let auth_id = Uuid::parse_str(&auth.userId)?;
 
     let mut batch: Batch = Default::default();
-    let blogQuery = Query::from(format!("UPDATE sankar.blog SET title=?, body=?, metadata=? WHERE blogId=? AND uniqueId=?"));
-    let blogsQuery = Query::from(format!("UPDATE sankar.blogs SET title=?, body=?, metadata=? WHERE blogId=?"));
-    let userBlogsQuery = Query::from(format!("UPDATE sankar.userblogs SET title=?, body=?, metadata=? WHERE authorId=? AND blogId=?"));
-    let categoryBlogsQuery = Query::from(format!("UPDATE sankar.categoryblogs SET title=?, body=?, metadata=? WHERE category=? AND blogId=?"));
+    let blogQuery = Query::from(format!("UPDATE sankar.blog SET title=?, body=?, metadata=? WHERE docid=? AND uniqueId=?"));
+    let blogsQuery = Query::from(format!("UPDATE sankar.blogs SET title=?, body=?, metadata=? WHERE docid=?"));
+    let userBlogsQuery = Query::from(format!("UPDATE sankar.userblogs SET title=?, body=?, metadata=? WHERE authorId=? AND docid=?"));
+    let categoryBlogsQuery = Query::from(format!("UPDATE sankar.categoryblogs SET title=?, body=?, metadata=? WHERE category=? AND docid=?"));
 
     batch.append_statement(blogQuery);
     batch.append_statement(blogsQuery);
     batch.append_statement(userBlogsQuery);
     batch.append_statement(categoryBlogsQuery);
     app.batch(&batch, (
-        (&payload.title, &payload.body, &payload.metadata, &blogId, &uniqueId),
-        (&payload.title, &payload.body, &payload.metadata, &blogId),
-        (&payload.title, &payload.body, &payload.metadata, auth.userId, &blogId),
-        (&payload.title, &payload.body, &payload.metadata, &payload.category, &blogId),
+        (&payload.title, &payload.body, &payload.metadata, &docid, &uniqueId),
+        (&payload.title, &payload.body, &payload.metadata, &docid),
+        (&payload.title, &payload.body, &payload.metadata, auth.userId, &docid),
+        (&payload.title, &payload.body, &payload.metadata, &payload.category, &docid),
     )).await?;
 
     Ok(HttpResponse::Ok().body("Updated".to_string()))

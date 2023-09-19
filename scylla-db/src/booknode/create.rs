@@ -17,7 +17,7 @@ pub struct AppendNodeRequest {
     title: String,
     body: String,
     identity: i16,
-    bookId: String,
+    docid: String,
     pageId: Option<String>,
     topUniqueId: String,
     metadata: String,
@@ -63,7 +63,7 @@ pub async fn create(
     }
 
     let timeuidstr = timeuid.to_string();
-    let book_id = &payload.bookId.to_uuid()?;
+    let book_id = &payload.docid.to_uuid()?;
     let top_unique_id = &payload.topUniqueId.to_uuid()?;
     let mut image_url = None;
     if let Some(b) = &payload.image_url {
