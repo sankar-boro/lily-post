@@ -4,8 +4,7 @@ use actix_web::{HttpResponse, web};
 use crate::error::Error;
 use super::model::DeleteNode;
 
-pub static UPDATE_NODE: &str = "UPDATE booknode SET parentid=$1 WHERE uid=$2";
-pub static UPDATE_TITLE: &str = "UPDATE title SET parentid=$1 WHERE uid=$2";
+pub static UPDATE_NODE: &str = "UPDATE blognode SET parentid=$1 WHERE uid=$2";
 
 pub async fn delete(
   app: web::Data<Pool>,
@@ -22,20 +21,15 @@ pub async fn delete(
     ids.push(',');
     ids.push_str(&id.to_string());
   }
-  let mut delete_title = "DELETE FROM title where uid IN (".to_string();
-  delete_title.push_str(&ids);
-  delete_title.push(')');
 
-  let mut delete_node = "DELETE FROM booknode where uid IN (".to_string();
+  let mut delete_node = "DELETE FROM blognode where uid IN (".to_string();
   delete_node.push_str(&ids);
   delete_node.push(')');
 
-  conn.query(&delete_title, &[]).await?;
   conn.query(&delete_node, &[]).await?;
 
   if let Some(update_data) = &payload.update {
     conn.query(UPDATE_NODE, &[&update_data.tuid, &update_data.buid]).await?;
-    conn.query(UPDATE_TITLE, &[&update_data.tuid, &update_data.buid]).await?;
   }
 
   Ok(HttpResponse::Ok().body("Deleted book."))
