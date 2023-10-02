@@ -1,4 +1,5 @@
 ### Postgres shortcuts
+
 ```psql
 \dt;		// list database tables;
 exit;		// exit
@@ -31,19 +32,18 @@ CREATE TABLE book (
 	createdat TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updatedat TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
-
 CREATE TABLE title (
-	uid serial PRIMARY KEY,
+	uid serial,
 	docid INT NOT NULL,
 	parentid INT,
 	title TEXT NOT NULL,
   identity SMALLINT NOT NULL,
 	createdat TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-  updatedat TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+  updatedat TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (docid)
 );
-
 CREATE TABLE booknode (
-	uid serial PRIMARY KEY,
+	uid serial,
   authorid INT NOT NULL,
 	docid INT NOT NULL,
 	pageid INT NOT NULL,
@@ -57,15 +57,12 @@ CREATE TABLE booknode (
   updatedat TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX booknodeidx ON booknode (docid, pageid);
-
-DROP TABLE book;
-DROP TABLE title;
-DROP TABLE booknode;
+CREATE INDEX docid ON title(docid);
+CLUSTER title USING docid;
+CREATE INDEX bookNodeIndex ON booknode(docid, pageid);
+CLUSTER booknode USING bookNodeIndex;
 
 ```
-
-
 
 ### Create Blogs table
 
@@ -80,9 +77,8 @@ CREATE TABLE blog (
 	createdat TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   	updatedat TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
-
 CREATE TABLE blognode (
-	uid serial PRIMARY KEY,
+	uid serial,
   	authorid INT NOT NULL,
 	docid INT NOT NULL,
 	parentid INT,
@@ -95,6 +91,12 @@ CREATE TABLE blognode (
   	updatedat TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX blogNodeIndex ON blognode(docid);
+CLUSTER blognode USING blogNodeIndex;
+
+DROP TABLE book;
+DROP TABLE title;
+DROP TABLE booknode;
 DROP TABLE blog;
 DROP TABLE blognode;
 ```
