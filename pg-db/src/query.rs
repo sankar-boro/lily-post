@@ -39,7 +39,7 @@ pub static CREATE_BLOG: &str = "INSERT INTO blog (
     authorid, title, body, imageurl, metadata
 ) VALUES(
     $1, $2, $3, $4, $5
-) RETURNING uid";
+) RETURNING blogid";
 
 pub static CREATE_BLOG_NODE: &str = "INSERT INTO blognode (
     authorid, docid, parentid, title, body, imageurl, identity, metadata
@@ -54,4 +54,4 @@ pub static DELETE_BLOGS: &str = "DELETE FROM blogs where uid=$1";
 /* Blog */
 
 
-pub static SIGNUP: &str = "INSERT INTO users (fname, lname, email, password) VALUES ($1, $2, $3, $4) RETURNING uid";
+pub static SIGNUP: &str = "INSERT INTO users (fname, lname, email, password) VALUES ($1, $2, $3, $4) RETURNING userid";

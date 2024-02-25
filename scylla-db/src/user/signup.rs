@@ -11,8 +11,8 @@ use lily_utils::{encrypt_text};
 lazy_static! {
     static ref MATCH_NAME: Regex = Regex::new(r"^[A-Za-z][A-Za-z0-9_]{2,29}$").unwrap();
 }
-static INSERT_USER: &str = "INSERT INTO users (fname, lname, email, pwd) VALUES ($1, $2, $3, $4) RETURNING userId";
-static INSERT_USER_ADMIN: &str = "INSERT INTO users (userId, fname, lname, email, pwd) VALUES ($1, $2, $3, $4, $5)";
+static INSERT_USER: &str = "INSERT INTO users (fname, lname, email, password) VALUES ($1, $2, $3, $4) RETURNING userId";
+static INSERT_USER_ADMIN: &str = "INSERT INTO users (userId, fname, lname, email, password) VALUES ($1, $2, $3, $4, $5)";
 
 
 #[derive(Deserialize, Validate)]
